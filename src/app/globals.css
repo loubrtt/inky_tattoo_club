@@ -17,6 +17,21 @@
   --font-sans: var(--font-dm-sans), ui-sans-serif, system-ui, sans-serif;
   --font-display: var(--font-manrope), ui-sans-serif, system-ui, sans-serif;
   --shadow-soft: 0 12px 34px rgba(43, 26, 52, 0.055);
+
+  /* Landing publique (charte vitrine, distincte de l'appli). */
+  --color-night: #121013;
+  --color-night-raised: #1b181c;
+  --color-bone: #f1ece4;
+  --color-bone-dim: #a9a39b;
+  --color-flash: #ff8edb;
+}
+
+/* Polices de la landing : chargées par next/font sur la page elle-même (pas sur <html>),
+   donc « inline » pour que la classe utilise directement la variable de l'élément. */
+@theme inline {
+  --font-editorial: var(--font-playfair), Georgia, serif;
+  --font-label: var(--font-jetbrains), ui-monospace, monospace;
+  --font-gothic: var(--font-gothic-face), "Old English Text MT", serif;
 }
 
 body {
@@ -79,5 +94,245 @@ body {
   * {
     animation-duration: 0.01ms !important;
     transition-duration: 0.01ms !important;
+  }
+}
+
+/* Landing : animations façon Apple. Tout est en CSS, sur transform / opacity / filter.
+   Sans préférence « mouvement réduit » uniquement ; les révélations au scroll ne s'activent
+   que si le navigateur gère animation-timeline, sinon tout reste simplement visible. */
+@keyframes landing-rise {
+  from {
+    opacity: 0;
+    translate: 0 28px;
+    filter: blur(8px);
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+    filter: blur(0);
+  }
+}
+@keyframes landing-recede {
+  to {
+    opacity: 0;
+    scale: 0.92;
+    filter: blur(6px);
+  }
+}
+@keyframes landing-light {
+  from {
+    opacity: 0.2;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html:has(.landing) {
+    scroll-behavior: smooth;
+  }
+
+  /* Entrée du hero au chargement, en cascade (--i = rang). */
+  .landing .hero-in {
+    animation: landing-rise 900ms cubic-bezier(0.2, 0, 0, 1) both;
+    animation-delay: calc(var(--i, 0) * 110ms + 80ms);
+  }
+
+  @supports (animation-timeline: view()) {
+    /* Apparition quand l'élément entre à l'écran. */
+    .landing .reveal {
+      animation: landing-rise cubic-bezier(0.2, 0, 0, 1) both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 80%;
+    }
+
+    /* Le grand titre recule et s'efface quand on le dépasse. */
+    .landing .hero-recede {
+      transform-origin: left bottom;
+      animation: landing-recede linear both;
+      animation-timeline: view();
+      animation-range: exit 0% exit 100%;
+    }
+
+    /* Phrase qui s'allume mot après mot pendant le scroll. */
+    .landing .lit {
+      view-timeline-name: --lit;
+    }
+    .landing .lit-word {
+      animation: landing-light linear both;
+      animation-timeline: --lit;
+      animation-range: cover var(--from) cover var(--to);
+    }
+  }
+}
+
+/* Landing : barre de défilement sombre et fine, accordée au fond. */
+html:has(.landing) {
+  color-scheme: dark;
+  background: var(--color-night);
+  scrollbar-width: thin;
+  scrollbar-color: rgb(241 236 228 / 0.22) var(--color-night);
+}
+/* Safari et anciens Chrome, qui ignorent scrollbar-color. */
+html:has(.landing)::-webkit-scrollbar {
+  width: 10px;
+}
+html:has(.landing)::-webkit-scrollbar-track {
+  background: var(--color-night);
+}
+html:has(.landing)::-webkit-scrollbar-thumb {
+  border: 3px solid var(--color-night);
+  border-radius: 999px;
+  background: rgb(241 236 228 / 0.22);
+}
+html:has(.landing)::-webkit-scrollbar-thumb:hover {
+  background: var(--color-flash);
+}
+
+/* Landing : glitch du grand titre, qui passe en gothique pendant l'éclat.
+   Les calques sont invisibles par défaut : sans animation, seul le vrai texte s'affiche. */
+.landing .glitch-layer {
+  position: absolute;
+  inset: 0;
+  font-family: var(--font-gothic-face), "Old English Text MT", serif;
+  white-space: nowrap;
+  font-weight: 400;
+  letter-spacing: 0;
+  opacity: 0;
+  pointer-events: none;
+  user-select: none;
+}
+
+@keyframes glitch-base {
+  0%,
+  9%,
+  100% {
+    opacity: 1;
+    translate: 0 0;
+  }
+  1% {
+    opacity: 0;
+  }
+  2.5% {
+    opacity: 1;
+    translate: -4px 0;
+  }
+  3.5% {
+    opacity: 0;
+    translate: 0 0;
+  }
+  8% {
+    opacity: 1;
+    translate: 3px 0;
+  }
+}
+@keyframes glitch-goth {
+  0%,
+  100% {
+    opacity: 0;
+    translate: 0 0;
+  }
+  1% {
+    opacity: 1;
+  }
+  2.5% {
+    opacity: 0;
+  }
+  3.5% {
+    opacity: 1;
+    translate: 2px 0;
+  }
+  5% {
+    translate: -3px 0;
+  }
+  6.5% {
+    translate: 1px 0;
+  }
+  8% {
+    opacity: 0;
+    translate: 0 0;
+  }
+}
+@keyframes glitch-slice-a {
+  0%,
+  100% {
+    opacity: 0;
+    clip-path: inset(0 0 100% 0);
+    translate: 0 0;
+  }
+  1% {
+    opacity: 0.9;
+    clip-path: inset(10% 0 62% 0);
+    translate: -10px 0;
+  }
+  2% {
+    clip-path: inset(55% 0 22% 0);
+    translate: 7px 0;
+  }
+  3.5% {
+    clip-path: inset(30% 0 48% 0);
+    translate: -5px 0;
+  }
+  5% {
+    clip-path: inset(72% 0 6% 0);
+    translate: 12px 0;
+  }
+  6.5% {
+    clip-path: inset(4% 0 82% 0);
+    translate: -7px 0;
+  }
+  8% {
+    opacity: 0;
+  }
+}
+@keyframes glitch-slice-b {
+  0%,
+  100% {
+    opacity: 0;
+    clip-path: inset(0 0 100% 0);
+    translate: 0 0;
+  }
+  1.5% {
+    opacity: 0.55;
+    clip-path: inset(68% 0 12% 0);
+    translate: 9px 0;
+  }
+  3% {
+    clip-path: inset(20% 0 64% 0);
+    translate: -12px 0;
+  }
+  4.5% {
+    clip-path: inset(44% 0 38% 0);
+    translate: 5px 0;
+  }
+  6% {
+    clip-path: inset(84% 0 2% 0);
+    translate: -4px 0;
+  }
+  7.5% {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .landing .glitch > * {
+    animation-duration: 5s;
+    animation-delay: 1.6s;
+    animation-iteration-count: infinite;
+    animation-timing-function: steps(1, end);
+  }
+  .landing .glitch-base {
+    animation-name: glitch-base;
+  }
+  .landing .glitch-goth {
+    animation-name: glitch-goth;
+  }
+  .landing .glitch-slice-a {
+    animation-name: glitch-slice-a;
+  }
+  .landing .glitch-slice-b {
+    animation-name: glitch-slice-b;
+    mix-blend-mode: screen;
   }
 }
