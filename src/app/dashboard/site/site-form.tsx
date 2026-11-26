@@ -1,5 +1,6 @@
 "use client";
 
+import { Plus } from "lucide-react";
 import { useActionState, useRef, useState, type ReactNode } from "react";
 import { saveLanding } from "@/lib/landing/actions";
 import type { LandingContent } from "@/lib/landing/content";
@@ -96,7 +97,7 @@ function Card({ title, hint, children }: { title: string; hint?: string; childre
 }
 
 const smallButton =
-  "border-line hover:bg-wash rounded-lg border px-3 py-2 text-xs font-semibold disabled:cursor-not-allowed disabled:opacity-40";
+  "border-line hover:bg-wash inline-flex items-center gap-1.5 rounded-lg border px-3 py-2 text-xs font-semibold disabled:cursor-not-allowed disabled:opacity-40";
 
 export function SiteForm({ initial }: { initial: LandingContent }) {
   const [draft, setDraft] = useState<Draft>(() => toDraft(initial));
@@ -270,7 +271,8 @@ export function SiteForm({ initial }: { initial: LandingContent }) {
               ])
             }
           >
-            ＋ Ajouter un artiste
+            <Plus aria-hidden size={16} />
+            Ajouter un artiste
           </button>
           {err("artists") && <p className="text-danger mt-2 text-xs">{err("artists")}</p>}
         </div>
@@ -346,7 +348,8 @@ export function SiteForm({ initial }: { initial: LandingContent }) {
                 set("hours", [...draft.hours, { key: newKey("h"), days: "", hours: "" }])
               }
             >
-              ＋ Ajouter une ligne d’horaires
+              <Plus aria-hidden size={16} />
+              Ajouter une ligne d’horaires
             </button>
           </div>
         </div>

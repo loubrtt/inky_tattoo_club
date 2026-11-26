@@ -27,6 +27,7 @@ export type Appointment = {
   clientId: string | null;
   clientName: string | null;
   artistId: string | null;
+  projectId: string | null;
   notes: string | null;
 };
 

@@ -18,12 +18,7 @@ export default async function SettingsPage() {
 
   return (
     <>
-      <PageHeading
-        eyebrow="Configuration"
-        title="Réglages"
-        accent="studio."
-        subtitle="Les bases de l’espace INKY CLIENT."
-      />
+      <PageHeading title="Réglages" description="Ton compte et les informations du studio." />
       <div className="divide-line border-line bg-paper shadow-soft divide-y rounded-2xl border">
         {rows.map((r) => (
           <div

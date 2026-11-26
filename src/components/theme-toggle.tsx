@@ -1,13 +1,14 @@
 "use client";
 
 import { startTransition, useState } from "react";
+import { Monitor, Moon, Sun, type LucideIcon } from "lucide-react";
 import { themeAttr, type Theme } from "@/lib/theme";
 import { saveTheme } from "@/lib/theme-actions";
 
-const OPTIONS: { value: Theme; label: string; icon: string }[] = [
-  { value: "light", label: "Clair", icon: "☀" },
-  { value: "system", label: "Auto", icon: "◐" },
-  { value: "dark", label: "Sombre", icon: "☾" },
+const OPTIONS: { value: Theme; label: string; icon: LucideIcon }[] = [
+  { value: "light", label: "Clair", icon: Sun },
+  { value: "system", label: "Auto", icon: Monitor },
+  { value: "dark", label: "Sombre", icon: Moon },
 ];
 
 // Choix du thème : appliqué tout de suite dans la page, puis gardé dans un cookie par le
@@ -33,6 +34,7 @@ export function ThemeToggle({ initial }: { initial: Theme }) {
     >
       {OPTIONS.map((o) => {
         const active = theme === o.value;
+        const Icon = o.icon;
         return (
           <button
             key={o.value}
@@ -40,11 +42,11 @@ export function ThemeToggle({ initial }: { initial: Theme }) {
             role="radio"
             aria-checked={active}
             onClick={() => choose(o.value)}
-            className={`flex items-center justify-center gap-1.5 rounded-lg px-2 py-1.5 text-[11px] font-semibold transition ${
+            className={`flex items-center justify-center gap-1.5 rounded-lg px-2 py-1.5 text-xs font-semibold transition ${
               active ? "bg-paper text-violet-ink shadow-soft" : "text-muted hover:text-ink"
             }`}
           >
-            <span aria-hidden>{o.icon}</span>
+            <Icon aria-hidden size={14} />
             {o.label}
           </button>
         );

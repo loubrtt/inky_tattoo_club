@@ -12,10 +12,8 @@ export default async function ClientsPage() {
   return (
     <>
       <PageHeading
-        eyebrow="Carnet du studio"
-        title="Les"
-        accent="clients."
-        subtitle="Retrouver et organiser les dossiers clients."
+        title="Clients"
+        description="Les fiches clients du studio."
         action={<NewClientDialog />}
       />
       <ClientTable clients={rows} />

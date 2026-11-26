@@ -14,6 +14,7 @@ const a = (id: string, startMin: number, endMin: number): Appointment => ({
   clientId: null,
   clientName: null,
   artistId: null,
+  projectId: null,
   notes: null,
 });
 

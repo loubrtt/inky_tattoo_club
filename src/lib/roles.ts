@@ -31,3 +31,9 @@ export function canEditMember(me: StudioRole, target: StudioRole) {
   if (!canManageTeam(me)) return false;
   return me === "owner" || target !== "owner";
 }
+
+// Voir et saisir les montants (devis, règlements) : owner, admin, artist. Revérifié en base
+// (inky_can_see_money) ; un assistant ne voit aucun montant.
+export function canSeeMoney(role: StudioRole) {
+  return role === "owner" || role === "admin" || role === "artist";
+}

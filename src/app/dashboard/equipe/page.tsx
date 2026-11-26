@@ -18,10 +18,8 @@ export default async function TeamPage() {
   return (
     <>
       <PageHeading
-        eyebrow="Gestion du studio"
-        title="L’"
-        accent="équipe."
-        subtitle={
+        title="Équipe"
+        description={
           manage
             ? "Inviter les tatoueurs et l’équipe, choisir leur rôle, retirer un accès."
             : "Les personnes qui ont accès au studio."

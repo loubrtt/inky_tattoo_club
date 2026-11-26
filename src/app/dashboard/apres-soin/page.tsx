@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { ComingSoon, PageHeading } from "@/components/page-heading";
+import { ComingSoon, NotBuiltYet, PageHeading } from "@/components/page-heading";
 
 export const metadata: Metadata = { title: "Suivi après-soin" };
 
@@ -7,11 +7,10 @@ export default function AftercarePage() {
   return (
     <>
       <PageHeading
-        eyebrow="Accompagnement client"
-        title="Après-"
-        accent="soin."
-        subtitle="Centraliser les consignes remises et le suivi après tatouage."
+        title="Suivi après-soin"
+        description="Centraliser les consignes remises et le suivi après tatouage."
       />
+      <NotBuiltYet />
       <ComingSoon
         items={[
           { title: "Consignes", text: "Version du document d’après-soin remise au client." },

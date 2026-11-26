@@ -20,10 +20,8 @@ export default async function SitePage() {
     return (
       <>
         <PageHeading
-          eyebrow="Site public"
-          title="Accès"
-          accent="réservé."
-          subtitle="Seuls les propriétaires et administrateurs du studio peuvent modifier le site public."
+          title="Site public"
+          description="Seuls les propriétaires et administrateurs du studio peuvent modifier le site public."
         />
       </>
     );
@@ -34,10 +32,8 @@ export default async function SitePage() {
   return (
     <>
       <PageHeading
-        eyebrow="Site public"
-        title="Ta landing,"
-        accent="en direct."
-        subtitle={
+        title="Site public"
+        description={
           site?.updatedAt
             ? `Dernière modification le ${dateFormat.format(new Date(site.updatedAt))}.`
             : "Ce que tu enregistres ici s’affiche tout de suite sur la page publique."
