@@ -6,7 +6,7 @@ import { Planning } from "./planning";
 
 export const metadata: Metadata = { title: "Planning" };
 
-export default async function PlanningPage({ searchParams }: PageProps<"/planning">) {
+export default async function PlanningPage({ searchParams }: PageProps<"/dashboard/planning">) {
   const params = await searchParams;
   const range = rangeFor(parseView(params.vue), parseDateKey(params.date));
   const selected = typeof params.rdv === "string" ? params.rdv : null;

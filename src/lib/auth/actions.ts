@@ -97,7 +97,7 @@ export async function updatePassword(_prev: FormState, formData: FormData): Prom
     }
     return { message: "Le mot de passe n'a pas pu être modifié. Réessaie." };
   }
-  redirect("/");
+  redirect("/dashboard");
 }
 
 export async function signOut() {

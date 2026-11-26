@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { layoutDay } from "@/app/(app)/planning/layout-events";
+import { layoutDay } from "@/app/dashboard/planning/layout-events";
 import type { Appointment } from "@/lib/planning/types";
 
 const a = (id: string, startMin: number, endMin: number): Appointment => ({

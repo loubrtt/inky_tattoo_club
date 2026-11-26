@@ -8,8 +8,11 @@ const securityHeaders = [
   { key: "Strict-Transport-Security", value: "max-age=63072000; includeSubDomains; preload" },
 ];
 
-// Pas de cacheComponents : toutes les pages sont privées et propres à chaque utilisateur,
+// Pas de cacheComponents : les pages du dashboard sont privées et propres à chaque utilisateur,
 // on ne veut aucune donnée client mise en cache côté serveur.
+
+// Anciennes adresses de l'appli (avant /dashboard) : on garde les favoris fonctionnels.
+const LEGACY_APP_PATHS = ["planning", "clients", "projets", "devis", "apres-soin", "reglages"];
 const nextConfig: NextConfig = {
   poweredByHeader: false,
   turbopack: {
@@ -19,6 +22,12 @@ const nextConfig: NextConfig = {
         as: "*.css",
       },
     },
+  },
+  async redirects() {
+    return LEGACY_APP_PATHS.flatMap((p) => [
+      { source: `/${p}`, destination: `/dashboard/${p}`, permanent: false },
+      { source: `/${p}/:path*`, destination: `/dashboard/${p}/:path*`, permanent: false },
+    ]);
   },
   async headers() {
     return [{ source: "/:path*", headers: securityHeaders }];

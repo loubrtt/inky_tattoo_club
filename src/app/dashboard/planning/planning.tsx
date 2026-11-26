@@ -17,7 +17,7 @@ const VIEW_LABELS: Record<PlanningView, string> = {
 export function planningHref(view: PlanningView, date: string, rdv?: string | null) {
   const p = new URLSearchParams({ vue: view, date });
   if (rdv) p.set("rdv", rdv);
-  return `/planning?${p.toString()}`;
+  return `/dashboard/planning?${p.toString()}`;
 }
 
 function addHour(time: string) {

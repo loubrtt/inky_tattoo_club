@@ -6,14 +6,18 @@ import { requireStudio } from "@/lib/auth/dal";
 import { signOut } from "@/lib/auth/actions";
 import { ROLE_LABELS } from "@/lib/roles";
 
-export default async function AppLayout({ children }: LayoutProps<"/">) {
+export default async function AppLayout({ children }: LayoutProps<"/dashboard">) {
   const { user, studios, current } = await requireStudio();
   const initial = (user.email ?? "I").charAt(0).toUpperCase();
 
   return (
     <div className="flex min-h-full flex-1 flex-col lg:flex-row">
       <aside className="border-line bg-paper border-b px-4 py-4 lg:fixed lg:inset-y-0 lg:left-0 lg:flex lg:w-62 lg:flex-col lg:border-r lg:border-b-0 lg:px-4 lg:py-7">
-        <Link href="/" className="mb-4 block px-2 lg:mb-10" aria-label="Accueil INKY CLIENT">
+        <Link
+          href="/dashboard"
+          className="mb-4 block px-2 lg:mb-10"
+          aria-label="Vue d’ensemble INKY CLIENT"
+        >
           <Brand />
         </Link>
         <div className="eyebrow mb-3 hidden px-3 lg:block">{current.studioName}</div>
