@@ -3,7 +3,8 @@ import Link from "next/link";
 import { JetBrains_Mono, Pirata_One, Playfair_Display } from "next/font/google";
 import type { CSSProperties, ReactNode } from "react";
 import { getCurrentUser } from "@/lib/auth/dal";
-import { instagramUrl, LANDING, mailtoUrl, telUrl } from "@/lib/landing/content";
+import { instagramUrl, mailtoUrl, telUrl } from "@/lib/landing/content";
+import { getPublicLanding } from "@/lib/landing/data";
 import { CursorLight } from "./cursor-light";
 import { SmoothAnchors } from "./smooth-anchors";
 
@@ -17,10 +18,13 @@ const jetbrains = JetBrains_Mono({ variable: "--font-jetbrains", subsets: ["lati
 // Police gothique du glitch : changer ici pour en essayer une autre.
 const gothic = Pirata_One({ variable: "--font-gothic-face", subsets: ["latin"], weight: "400" });
 
-export const metadata: Metadata = {
-  title: { absolute: LANDING.studioName },
-  description: `Studio de tatouage ${LANDING.studioName}.`,
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const { studioName } = await getPublicLanding();
+  return {
+    title: { absolute: studioName },
+    description: `Studio de tatouage ${studioName}.`,
+  };
+}
 
 const SECTIONS = [
   { id: "studio", label: "Le studio" },
@@ -145,7 +149,8 @@ export default async function LandingPage() {
   const team = user
     ? { href: "/dashboard", text: "Accéder à mon espace" }
     : { href: "/connexion", text: "Espace équipe" };
-  const { about, artists, practical, booking } = LANDING;
+  const { studioName, content } = await getPublicLanding();
+  const { about, artists, practical, booking } = content;
 
   return (
     <div
@@ -167,7 +172,7 @@ export default async function LandingPage() {
             href="#contenu"
             className={`font-editorial text-lg font-bold tracking-wide ${focusRing}`}
           >
-            {LANDING.studioName}
+            {studioName}
           </a>
           <nav aria-label="Sections de la page" className="hidden md:block">
             <ul className="flex gap-1">
@@ -201,15 +206,15 @@ export default async function LandingPage() {
             <h1 className="font-editorial hero-recede mt-6 text-[clamp(3rem,13vw,10rem)] leading-[0.88] font-black tracking-tight text-balance">
               {/* Glitch périodique : le titre passe en gothique le temps d'un éclat (globals.css). */}
               <span className="hero-in glitch relative block" style={order(1)}>
-                <span className="glitch-base block">{LANDING.studioName}</span>
+                <span className="glitch-base block">{studioName}</span>
                 <span aria-hidden className="glitch-layer glitch-goth">
-                  {LANDING.studioName}
+                  {studioName}
                 </span>
                 <span aria-hidden className="glitch-layer glitch-slice-a text-flash">
-                  {LANDING.studioName}
+                  {studioName}
                 </span>
                 <span aria-hidden className="glitch-layer glitch-slice-b text-white">
-                  {LANDING.studioName}
+                  {studioName}
                 </span>
               </span>
             </h1>
@@ -218,11 +223,11 @@ export default async function LandingPage() {
                 className="font-editorial hero-in text-2xl leading-snug text-pretty italic sm:text-3xl"
                 style={order(2)}
               >
-                <Fill value={LANDING.tagline} todo="phrase d’accroche" />
+                <Fill value={content.tagline} todo="phrase d’accroche" />
               </p>
               <div className="hero-in" style={order(3)}>
                 <div className="text-bone-dim leading-relaxed text-pretty">
-                  <Fill value={LANDING.intro} todo="présentation courte, 2 ou 3 phrases" block />
+                  <Fill value={content.intro} todo="présentation courte, 2 ou 3 phrases" block />
                 </div>
                 <a
                   href="#rendez-vous"
@@ -381,7 +386,7 @@ export default async function LandingPage() {
       <footer className="border-bone/12 border-t px-5 pt-20 pb-12 sm:px-10 lg:pt-28">
         <div className="mx-auto grid max-w-6xl gap-12 md:grid-cols-[1.5fr_1fr_1fr]">
           <div>
-            <p className="font-editorial text-4xl">{LANDING.studioName}</p>
+            <p className="font-editorial text-4xl">{studioName}</p>
             <address className="text-bone-dim mt-4 grid gap-1 not-italic">
               <span>
                 <Fill value={practical.address} todo="adresse" />
@@ -415,7 +420,7 @@ export default async function LandingPage() {
           </div>
         </div>
         <p className="text-bone-dim mx-auto mt-20 max-w-6xl text-sm">
-          © {new Date().getFullYear()} {LANDING.studioName}
+          © {new Date().getFullYear()} {studioName}
         </p>
       </footer>
     </div>

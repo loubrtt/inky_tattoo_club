@@ -17,7 +17,7 @@ make dev                     # http://localhost:3000 (libère le port avant)
 ## Structure
 
 `src/app/(auth)` connexion, mot de passe oublié, nouveau mot de passe, compte sans studio.
-`src/app/page.tsx` landing publique du studio (contenu à remplir dans `src/lib/landing/content.ts`).
+`src/app/page.tsx` landing publique du studio, contenu modifiable dans le dashboard (`/dashboard/site`, table `studio_sites`).
 `src/app/dashboard` écrans connectés : vue d’ensemble, planning, clients, projets, devis, après-soin, réglages.
 `src/app/auth/confirm` arrivée des liens reçus par e-mail.
 `src/lib/auth/dal.ts` seul point d'accès à l'utilisateur et au studio actif (côté serveur).
