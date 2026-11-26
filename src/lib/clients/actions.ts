@@ -30,7 +30,7 @@ export async function createClientRecord(_prev: FormState, formData: FormData): 
     return { message: "Fiche non enregistrée. Réessaie dans un instant." };
   }
 
-  revalidatePath("/clients");
-  revalidatePath("/");
+  revalidatePath("/dashboard/clients");
+  revalidatePath("/dashboard");
   return { ok: true, message: "Fiche enregistrée." };
 }

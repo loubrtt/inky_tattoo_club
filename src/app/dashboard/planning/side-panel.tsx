@@ -130,7 +130,10 @@ function Details({ appt, memberMap, onEdit, onClose }: Props & { appt: Appointme
           </div>
         ))}
         {appt.clientId && (
-          <Link href="/clients" className="text-violet text-sm font-semibold hover:underline">
+          <Link
+            href="/dashboard/clients"
+            className="text-violet text-sm font-semibold hover:underline"
+          >
             Voir les fiches clients →
           </Link>
         )}

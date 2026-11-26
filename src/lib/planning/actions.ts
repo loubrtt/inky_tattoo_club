@@ -72,7 +72,7 @@ export async function saveAppointment(_prev: FormState, formData: FormData): Pro
     id = data.id as string;
   }
 
-  revalidatePath("/planning");
+  revalidatePath("/dashboard/planning");
   return { ok: true, id: id ?? undefined, message: "Rendez-vous enregistré." };
 }
 
@@ -92,6 +92,6 @@ export async function deleteAppointment(_prev: FormState, formData: FormData): P
   if (error) return dbError("planning:delete", error);
   if (!data?.length) return { message: "Ce rendez-vous a déjà été supprimé." };
 
-  revalidatePath("/planning");
+  revalidatePath("/dashboard/planning");
   return { ok: true, message: "Rendez-vous supprimé." };
 }

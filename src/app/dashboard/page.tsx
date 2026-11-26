@@ -6,9 +6,9 @@ import { PageHeading } from "@/components/page-heading";
 import { NewClientDialog } from "./clients/new-client-dialog";
 
 const MODULES = [
-  { href: "/projets", label: "Projets en cours", icon: "✳" },
-  { href: "/devis", label: "Devis à suivre", icon: "€" },
-  { href: "/apres-soin", label: "Suivis après-soin", icon: "♡" },
+  { href: "/dashboard/projets", label: "Projets en cours", icon: "✳" },
+  { href: "/dashboard/devis", label: "Devis à suivre", icon: "€" },
+  { href: "/dashboard/apres-soin", label: "Suivis après-soin", icon: "♡" },
 ];
 
 export default async function DashboardPage() {
@@ -26,7 +26,7 @@ export default async function DashboardPage() {
       />
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <Link
-          href="/clients"
+          href="/dashboard/clients"
           className="border-line bg-paper shadow-soft hover:border-violet rounded-2xl border p-5"
         >
           <span className="text-muted flex justify-between">

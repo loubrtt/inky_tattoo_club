@@ -7,7 +7,7 @@ export const metadata: Metadata = { title: "Aucun accès studio" };
 
 export default async function NoStudioPage() {
   const user = await requireUser();
-  if ((await getMemberships(user.id)).length) redirect("/");
+  if ((await getMemberships(user.id)).length) redirect("/dashboard");
 
   return (
     <>

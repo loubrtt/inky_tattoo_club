@@ -4,13 +4,13 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 export const NAV = [
-  { href: "/", label: "Vue d’ensemble", icon: "⌂" },
-  { href: "/planning", label: "Planning", icon: "◷" },
-  { href: "/clients", label: "Clients", icon: "♙" },
-  { href: "/projets", label: "Projets & séances", icon: "✳" },
-  { href: "/devis", label: "Devis & paiements", icon: "€" },
-  { href: "/apres-soin", label: "Suivi après-soin", icon: "♡" },
-  { href: "/reglages", label: "Réglages", icon: "⚙" },
+  { href: "/dashboard", label: "Vue d’ensemble", icon: "⌂" },
+  { href: "/dashboard/planning", label: "Planning", icon: "◷" },
+  { href: "/dashboard/clients", label: "Clients", icon: "♙" },
+  { href: "/dashboard/projets", label: "Projets & séances", icon: "✳" },
+  { href: "/dashboard/devis", label: "Devis & paiements", icon: "€" },
+  { href: "/dashboard/apres-soin", label: "Suivi après-soin", icon: "♡" },
+  { href: "/dashboard/reglages", label: "Réglages", icon: "⚙" },
 ] as const;
 
 export function Nav() {
@@ -18,7 +18,8 @@ export function Nav() {
   return (
     <nav aria-label="Navigation principale" className="flex gap-1 overflow-x-auto lg:grid">
       {NAV.map((item) => {
-        const active = item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
+        const active =
+          item.href === "/dashboard" ? pathname === "/dashboard" : pathname.startsWith(item.href);
         return (
           <Link
             key={item.href}
