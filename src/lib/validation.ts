@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { APPOINTMENT_KINDS } from "@/lib/planning/types";
 
 const email = z.string().trim().toLowerCase().max(254).pipe(z.email("Adresse e-mail invalide."));
 
@@ -40,6 +41,28 @@ export const clientSchema = z.object({
   project: optionalText(1000),
 });
 
+const uuidOrEmpty = z
+  .string()
+  .trim()
+  .refine((v) => v === "" || z.uuid().safeParse(v).success, "Valeur invalide.")
+  .transform((v) => (v === "" ? null : v));
+
+const time = z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/, "Heure invalide.");
+
+export const appointmentSchema = z
+  .object({
+    id: uuidOrEmpty,
+    title: z.string().trim().min(1, "Titre requis.").max(120, "120 caractères maximum."),
+    kind: z.enum(APPOINTMENT_KINDS, "Type invalide."),
+    date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Date invalide."),
+    start: time,
+    end: time,
+    clientId: uuidOrEmpty,
+    artistId: uuidOrEmpty,
+    notes: optionalText(2000),
+  })
+  .refine((v) => v.end > v.start, { path: ["end"], message: "La fin doit être après le début." });
+
 export type FieldErrors = Partial<Record<string, string>>;
 
 export function fieldErrors(error: z.ZodError): FieldErrors {
@@ -56,4 +79,10 @@ export function formToObject(formData: FormData, keys: readonly string[]) {
   return Object.fromEntries(keys.map((k) => [k, String(formData.get(k) ?? "")]));
 }
 
-export type FormState = { ok?: boolean; message?: string; errors?: FieldErrors };
+export type FormState = {
+  ok?: boolean;
+  message?: string;
+  errors?: FieldErrors;
+  id?: string;
+  attempt?: number;
+};

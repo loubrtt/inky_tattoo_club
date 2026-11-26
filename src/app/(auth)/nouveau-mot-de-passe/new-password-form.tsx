@@ -2,13 +2,13 @@
 
 import { useActionState } from "react";
 import { updatePassword } from "@/lib/auth/actions";
-import { Field, FormMessage, SubmitButton } from "@/components/ui";
+import { ActionForm, Field, FormMessage, SubmitButton } from "@/components/ui";
 
 export function NewPasswordForm() {
-  const [state, action] = useActionState(updatePassword, {});
+  const [state, action, pending] = useActionState(updatePassword, {});
 
   return (
-    <form action={action} className="grid gap-4" noValidate>
+    <ActionForm action={action} className="grid gap-4">
       <Field
         label="Nouveau mot de passe (8 caractères minimum)"
         name="password"
@@ -28,7 +28,9 @@ export function NewPasswordForm() {
         error={state.errors?.confirm}
       />
       <FormMessage message={state.message} ok={state.ok} />
-      <SubmitButton pendingLabel="Enregistrement…">Enregistrer</SubmitButton>
-    </form>
+      <SubmitButton pending={pending} pendingLabel="Enregistrement…">
+        Enregistrer
+      </SubmitButton>
+    </ActionForm>
   );
 }

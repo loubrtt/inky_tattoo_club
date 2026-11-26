@@ -1,18 +1,40 @@
 "use client";
 
 import { useFormStatus } from "react-dom";
-import type { ComponentProps, ReactNode } from "react";
+import { startTransition, type ComponentProps, type FormEvent, type ReactNode } from "react";
+
+// Formulaire qui envoie l'action SANS que React vide les champs après coup
+// (avec <form action>, React 19 réinitialise le formulaire, même en cas d'erreur).
+export function ActionForm({
+  action,
+  children,
+  ...props
+}: Omit<ComponentProps<"form">, "action" | "onSubmit"> & { action: (formData: FormData) => void }) {
+  const onSubmit = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    startTransition(() => action(formData));
+  };
+  return (
+    <form {...props} onSubmit={onSubmit} noValidate>
+      {children}
+    </form>
+  );
+}
 
 export function SubmitButton({
   children,
   pendingLabel,
+  pending: pendingProp,
   className = "",
 }: {
   children: ReactNode;
   pendingLabel: string;
+  pending?: boolean;
   className?: string;
 }) {
-  const { pending } = useFormStatus();
+  const status = useFormStatus();
+  const pending = pendingProp ?? status.pending;
   return (
     <button
       type="submit"
@@ -81,6 +103,25 @@ export function TextArea({
   return (
     <FieldShell label={label} name={name} error={error} className={className}>
       {(a11y) => <textarea {...textarea} {...a11y} className={fieldClass(error)} />}
+    </FieldShell>
+  );
+}
+
+export function SelectField({
+  label,
+  name,
+  error,
+  className,
+  children,
+  ...select
+}: FieldBase & ComponentProps<"select">) {
+  return (
+    <FieldShell label={label} name={name} error={error} className={className}>
+      {(a11y) => (
+        <select {...select} {...a11y} className={fieldClass(error)}>
+          {children}
+        </select>
+      )}
     </FieldShell>
   );
 }

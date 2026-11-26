@@ -24,6 +24,16 @@ export async function GET(request: NextRequest) {
   const tokenHash = searchParams.get("token_hash");
   const type = searchParams.get("type") as EmailOtpType | null;
 
+  // Erreur renvoyée par le fournisseur (ex. connexion Google annulée).
+  if (searchParams.get("error")) {
+    console.error(
+      "[confirm:provider]",
+      searchParams.get("error"),
+      searchParams.get("error_code") ?? "",
+    );
+    return NextResponse.redirect(new URL("/connexion?erreur=google", request.nextUrl.origin));
+  }
+
   let ok = false;
   if (code) {
     const { error } = await supabase.auth.exchangeCodeForSession(code);
