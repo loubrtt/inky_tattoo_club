@@ -110,12 +110,23 @@ html:has(.app-theme[data-theme="dark"]) {
   }
 }
 
+/* Petit libellé de section (formulaires, détails). Discret : pas de capitales espacées criardes. */
 .eyebrow {
-  font-size: 0.625rem;
-  font-weight: 700;
-  letter-spacing: 0.17em;
-  color: #a49ba9;
-  text-transform: uppercase;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--color-muted);
+}
+
+/* Appli : anneau de focus visible au clavier, curseur main sur tout ce qui se clique. */
+.app-theme :focus-visible {
+  outline: 2px solid var(--color-violet);
+  outline-offset: 2px;
+}
+.app-theme button:not(:disabled),
+.app-theme [role="button"],
+.app-theme select:not(:disabled),
+.app-theme summary {
+  cursor: pointer;
 }
 
 /* Secousse « nope » (mot de passe refusé). Deux noms identiques pour relancer l'animation. */

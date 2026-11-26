@@ -1,10 +1,19 @@
 "use client";
 
+import { Plus, X } from "lucide-react";
+
 import { useActionState, useEffect, useRef } from "react";
 import { inviteMember } from "@/lib/team/actions";
 import { ROLE_LABELS } from "@/lib/roles";
 import type { StudioRole } from "@/lib/supabase/types";
-import { ActionForm, Field, FormMessage, SelectField, SubmitButton } from "@/components/ui";
+import {
+  ActionForm,
+  Field,
+  FormMessage,
+  primaryButton,
+  SelectField,
+  SubmitButton,
+} from "@/components/ui";
 
 export function InviteMemberDialog({ roles }: { roles: StudioRole[] }) {
   const dialog = useRef<HTMLDialogElement>(null);
@@ -17,12 +26,9 @@ export function InviteMemberDialog({ roles }: { roles: StudioRole[] }) {
 
   return (
     <>
-      <button
-        type="button"
-        onClick={() => dialog.current?.showModal()}
-        className="bg-violet shadow-soft hover:bg-violet-dark rounded-xl px-4 py-3 font-semibold text-white"
-      >
-        ＋ Inviter un membre
+      <button type="button" onClick={() => dialog.current?.showModal()} className={primaryButton}>
+        <Plus aria-hidden size={17} />
+        Inviter un membre
       </button>
       <dialog
         ref={dialog}
@@ -41,9 +47,9 @@ export function InviteMemberDialog({ roles }: { roles: StudioRole[] }) {
               type="button"
               onClick={() => dialog.current?.close()}
               aria-label="Fermer"
-              className="text-muted hover:bg-wash rounded-lg px-2 text-xl"
+              className="text-muted hover:bg-wash hover:text-ink grid size-9 place-items-center rounded-lg"
             >
-              ×
+              <X aria-hidden size={18} />
             </button>
           </div>
           <p className="text-muted text-sm">

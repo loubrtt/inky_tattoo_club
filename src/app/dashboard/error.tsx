@@ -1,5 +1,7 @@
 "use client";
 
+import { primaryButton } from "@/components/ui";
+
 export default function AppError({
   reset,
 }: {
@@ -12,10 +14,7 @@ export default function AppError({
       <p className="text-muted mt-2">
         Les données n&apos;ont pas pu être chargées. Réessaie dans un instant.
       </p>
-      <button
-        onClick={reset}
-        className="bg-violet mt-5 rounded-xl px-4 py-3 font-semibold text-white"
-      >
+      <button onClick={reset} className={`${primaryButton} mt-5`}>
         Réessayer
       </button>
     </div>

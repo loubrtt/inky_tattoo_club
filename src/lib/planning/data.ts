@@ -19,10 +19,12 @@ type Row = {
   ends_at: string;
   client_id: string | null;
   artist_id: string | null;
+  project_id?: string | null;
   notes: string | null;
 };
 
 const MAX_ROWS = 2000;
+const BASE_COLUMNS = "id, title, kind, starts_at, ends_at, client_id, artist_id, notes";
 
 export async function loadPlanning(
   range: PlanningRange,
@@ -31,18 +33,23 @@ export async function loadPlanning(
   const { current } = await requireStudio();
   const supabase = await createClient();
 
-  const [appts, dir] = await Promise.all([
+  const selectAppointments = (columns: string) =>
     supabase
       .from("appointments")
-      .select("id, title, kind, starts_at, ends_at, client_id, artist_id, notes")
+      .select(columns)
       .eq("studio_id", current.studioId)
       .is("deleted_at", null)
       .lt("starts_at", range.toIso)
       .gt("ends_at", range.fromIso)
       .order("starts_at")
-      .limit(MAX_ROWS),
+      .limit(MAX_ROWS);
+
+  const [first, dir] = await Promise.all([
+    selectAppointments(`${BASE_COLUMNS}, project_id`),
     supabase.rpc("inky_studio_directory", { p_studio: current.studioId }),
   ]);
+  // Colonne project_id absente tant que la migration projets n'est pas appliquée.
+  const appts = first.error?.code === "42703" ? await selectAppointments(BASE_COLUMNS) : first;
 
   for (const res of [appts, dir]) {
     if (res.error) {
@@ -56,7 +63,7 @@ export async function loadPlanning(
     (dir.data ?? []) as { user_id: string; role: string; email: string | null }[]
   ).map((m, i) => ({ userId: m.user_id, email: m.email ?? "—", role: m.role, color: i }));
 
-  const rows = (appts.data ?? []) as Row[];
+  const rows = (appts.data ?? []) as unknown as Row[];
   // Noms des clients absents de la liste chargée (au-delà des 500 plus récents).
   const missing = [
     ...new Set(
@@ -95,6 +102,7 @@ export async function loadPlanning(
       clientId: r.client_id,
       clientName: r.client_id ? (names.get(r.client_id) ?? "Fiche indisponible") : null,
       artistId: r.artist_id,
+      projectId: r.project_id ?? null,
       notes: r.notes,
     };
   });

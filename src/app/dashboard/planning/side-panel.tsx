@@ -1,5 +1,6 @@
 "use client";
 
+import { X } from "lucide-react";
 import Link from "next/link";
 import { useActionState, useEffect, useRef, useState } from "react";
 import { deleteAppointment, saveAppointment } from "@/lib/planning/actions";
@@ -11,6 +12,7 @@ import {
   type Member,
 } from "@/lib/planning/types";
 import { dayLabel } from "@/lib/planning/time";
+import type { ProjectOption } from "@/lib/projects/types";
 import type { FormState } from "@/lib/validation";
 import {
   ActionForm,
@@ -19,6 +21,7 @@ import {
   SelectField,
   SubmitButton,
   TextArea,
+  primaryButton,
 } from "@/components/ui";
 import { colorFor } from "./colors";
 
@@ -34,6 +37,8 @@ type Props = {
   members: Member[];
   memberMap: Map<string, Member>;
   clients: ClientOption[];
+  // null : projets pas encore activés (migration), le champ est masqué.
+  projects: ProjectOption[] | null;
   onClose: () => void;
   onEdit: (id: string) => void;
   onView: (id: string) => void;
@@ -68,9 +73,9 @@ export function SidePanel(props: Props) {
           type="button"
           onClick={onClose}
           aria-label="Fermer le panneau"
-          className="text-muted hover:bg-wash hover:text-ink grid size-9 shrink-0 place-items-center rounded-full text-xl"
+          className="text-muted hover:bg-wash hover:text-ink grid size-9 shrink-0 place-items-center rounded-full"
         >
-          ×
+          <X aria-hidden size={18} />
         </button>
       </div>
       <div className="flex-1 px-5 py-5">
@@ -88,7 +93,7 @@ export function SidePanel(props: Props) {
   );
 }
 
-function Details({ appt, memberMap, onEdit, onClose }: Props & { appt: Appointment }) {
+function Details({ appt, memberMap, projects, onEdit, onClose }: Props & { appt: Appointment }) {
   const c = colorFor(appt, memberMap);
   const artist = appt.artistId ? memberMap.get(appt.artistId) : undefined;
   const [confirming, setConfirming] = useState(false);
@@ -129,12 +134,20 @@ function Details({ appt, memberMap, onEdit, onClose }: Props & { appt: Appointme
             <dd className="mt-0.5 first-letter:uppercase">{r.value}</dd>
           </div>
         ))}
+        {appt.projectId && (
+          <Link
+            href={`/dashboard/projets/${appt.projectId}`}
+            className="text-violet block text-sm font-semibold hover:underline"
+          >
+            Projet : {projects?.find((p) => p.id === appt.projectId)?.title ?? "voir la fiche"}
+          </Link>
+        )}
         {appt.clientId && (
           <Link
             href="/dashboard/clients"
             className="text-violet text-sm font-semibold hover:underline"
           >
-            Voir les fiches clients →
+            Voir les fiches clients
           </Link>
         )}
         <div>
@@ -148,11 +161,7 @@ function Details({ appt, memberMap, onEdit, onClose }: Props & { appt: Appointme
       <FormMessage message={state.message} ok={state.ok} />
 
       <div className="border-line flex flex-wrap gap-2 border-t pt-5">
-        <button
-          type="button"
-          onClick={() => onEdit(appt.id)}
-          className="bg-violet shadow-soft hover:bg-violet-dark rounded-xl px-4 py-2.5 font-semibold text-white"
-        >
+        <button type="button" onClick={() => onEdit(appt.id)} className={primaryButton}>
           Modifier
         </button>
         {confirming ? (
@@ -192,6 +201,7 @@ function AppointmentForm({
   selection,
   members,
   clients,
+  projects,
   onView,
   onClose,
 }: Props & { appt: Appointment | null; selection: NonNullable<Selection> }) {
@@ -211,6 +221,7 @@ function AppointmentForm({
           end: selection.end,
           clientId: "",
           artistId: "",
+          projectId: "",
           notes: "",
         }
       : {
@@ -221,6 +232,7 @@ function AppointmentForm({
           end: appt?.endTime ?? "11:00",
           clientId: appt?.clientId ?? "",
           artistId: appt?.artistId ?? "",
+          projectId: appt?.projectId ?? "",
           notes: appt?.notes ?? "",
         };
 
@@ -277,7 +289,7 @@ function AppointmentForm({
         defaultValue={d.artistId}
         error={state.errors?.artistId}
       >
-        <option value="">— Non attribué —</option>
+        <option value="">Non attribué</option>
         {members.map((m) => (
           <option key={m.userId} value={m.userId}>
             {m.email}
@@ -290,13 +302,31 @@ function AppointmentForm({
         defaultValue={d.clientId}
         error={state.errors?.clientId}
       >
-        <option value="">— Aucun —</option>
+        <option value="">Aucun</option>
         {clients.map((c) => (
           <option key={c.id} value={c.id}>
             {c.name}
           </option>
         ))}
       </SelectField>
+      {projects && (
+        <SelectField
+          label="Projet (séance)"
+          name="projectId"
+          defaultValue={d.projectId}
+          error={state.errors?.projectId}
+        >
+          <option value="">Aucun projet</option>
+          {d.projectId && !projects.some((p) => p.id === d.projectId) && (
+            <option value={d.projectId}>Projet actuel</option>
+          )}
+          {projects.map((p) => (
+            <option key={p.id} value={p.id}>
+              {p.title} · {p.clientName}
+            </option>
+          ))}
+        </SelectField>
+      )}
       <TextArea
         label="Notes (facultatif)"
         name="notes"

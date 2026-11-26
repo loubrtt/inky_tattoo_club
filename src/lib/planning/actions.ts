@@ -16,6 +16,7 @@ const FIELDS = [
   "end",
   "clientId",
   "artistId",
+  "projectId",
   "notes",
 ] as const;
 
@@ -48,6 +49,8 @@ export async function saveAppointment(_prev: FormState, formData: FormData): Pro
     client_id: v.clientId,
     artist_id: v.artistId,
     notes: v.notes,
+    // Le champ projet n'est affiché que si les projets sont activés (migration appliquée).
+    ...(formData.has("projectId") ? { project_id: v.projectId } : {}),
   };
 
   const supabase = await createClient();
@@ -73,6 +76,7 @@ export async function saveAppointment(_prev: FormState, formData: FormData): Pro
   }
 
   revalidatePath("/dashboard/planning");
+  revalidatePath("/dashboard/projets", "layout");
   return { ok: true, id: id ?? undefined, message: "Rendez-vous enregistré." };
 }
 

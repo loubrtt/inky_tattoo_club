@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { Search } from "lucide-react";
 import type { ClientRow } from "@/lib/supabase/types";
 import { formatDate } from "@/lib/dates";
 
@@ -35,9 +36,7 @@ export function ClientTable({ clients }: { clients: ClientRow[] }) {
     <>
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <label className="border-line bg-paper flex min-w-0 flex-1 items-center gap-2 rounded-xl border px-3.5 py-2.5 sm:max-w-sm">
-          <span aria-hidden className="text-muted">
-            ⌕
-          </span>
+          <Search aria-hidden size={16} className="text-muted shrink-0" />
           <span className="sr-only">Rechercher un client</span>
           <input
             type="search"
@@ -62,17 +61,13 @@ export function ClientTable({ clients }: { clients: ClientRow[] }) {
           </p>
         ) : (
           <ul className="divide-line divide-y">
-            {visible.map(({ client: c }, index) => (
+            {visible.map(({ client: c }) => (
               <li
                 key={c.id}
                 className="grid gap-2 px-5 py-4 sm:grid-cols-[2fr_2fr_1fr] sm:items-center"
               >
                 <div className="flex min-w-0 items-center gap-3">
-                  <span
-                    className={`grid size-9 shrink-0 place-items-center rounded-full text-xs font-bold ${
-                      index % 2 ? "bg-violet-pale text-violet" : "bg-pink text-rose"
-                    }`}
-                  >
+                  <span className="bg-violet-pale text-violet grid size-9 shrink-0 place-items-center rounded-full text-xs font-bold">
                     {initials(c)}
                   </span>
                   <span className="min-w-0">

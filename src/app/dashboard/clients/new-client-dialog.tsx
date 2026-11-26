@@ -1,10 +1,19 @@
 "use client";
 
+import { Plus, X } from "lucide-react";
+
 import { useActionState, useEffect, useRef } from "react";
 import { createClientRecord } from "@/lib/clients/actions";
-import { ActionForm, Field, FormMessage, SubmitButton, TextArea } from "@/components/ui";
+import {
+  ActionForm,
+  Field,
+  FormMessage,
+  primaryButton,
+  SubmitButton,
+  TextArea,
+} from "@/components/ui";
 
-export function NewClientDialog({ label = "＋ Nouveau client" }: { label?: string }) {
+export function NewClientDialog({ label = "Nouveau client" }: { label?: string }) {
   const dialog = useRef<HTMLDialogElement>(null);
   const form = useRef<HTMLFormElement>(null);
   const [state, action, pending] = useActionState(createClientRecord, {});
@@ -18,11 +27,8 @@ export function NewClientDialog({ label = "＋ Nouveau client" }: { label?: stri
 
   return (
     <>
-      <button
-        type="button"
-        onClick={() => dialog.current?.showModal()}
-        className="bg-violet shadow-soft hover:bg-violet-dark rounded-xl px-4 py-3 font-semibold text-white"
-      >
+      <button type="button" onClick={() => dialog.current?.showModal()} className={primaryButton}>
+        <Plus aria-hidden size={17} />
         {label}
       </button>
       <dialog
@@ -42,9 +48,9 @@ export function NewClientDialog({ label = "＋ Nouveau client" }: { label?: stri
               type="button"
               onClick={() => dialog.current?.close()}
               aria-label="Fermer"
-              className="text-muted hover:bg-wash rounded-lg px-2 text-xl"
+              className="text-muted hover:bg-wash hover:text-ink grid size-9 place-items-center rounded-lg"
             >
-              ×
+              <X aria-hidden size={18} />
             </button>
           </div>
           <p className="bg-pink text-rose rounded-xl px-3.5 py-3 text-xs">

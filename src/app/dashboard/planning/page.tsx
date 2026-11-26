@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { listClients } from "@/lib/clients/data";
 import { loadPlanning } from "@/lib/planning/data";
+import { listProjectOptions } from "@/lib/projects/data";
 import { parseDateKey, parseView, rangeFor, todayKey } from "@/lib/planning/time";
 import { Planning } from "./planning";
 
@@ -18,7 +19,10 @@ export default async function PlanningPage({ searchParams }: PageProps<"/dashboa
       name: `${c.first_name ?? ""} ${c.last_name ?? ""}`.trim() || "Sans nom",
     }))
     .sort((a, b) => a.name.localeCompare(b.name, "fr"));
-  const data = await loadPlanning(range, new Map(clients.map((c) => [c.id, c.name])));
+  const [data, projects] = await Promise.all([
+    loadPlanning(range, new Map(clients.map((c) => [c.id, c.name]))),
+    listProjectOptions(),
+  ]);
 
   if (data.status === "missing-migration") {
     return (
@@ -42,6 +46,7 @@ export default async function PlanningPage({ searchParams }: PageProps<"/dashboa
       appointments={data.appointments}
       members={data.members}
       clients={clients}
+      projects={projects}
       initialSelected={selected}
     />
   );

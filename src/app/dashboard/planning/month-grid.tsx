@@ -4,7 +4,7 @@ import Link from "next/link";
 import type { Appointment, Member } from "@/lib/planning/types";
 import { dayLabel, sameMonth, type PlanningRange } from "@/lib/planning/time";
 import { colorFor } from "./colors";
-import { planningHref } from "./planning";
+import { planningHref } from "./links";
 
 const MAX_CHIPS = 3;
 

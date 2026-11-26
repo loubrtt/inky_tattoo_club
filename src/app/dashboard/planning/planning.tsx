@@ -1,24 +1,22 @@
 "use client";
 
 import Link from "next/link";
+import { ChevronLeft, ChevronRight, Plus } from "lucide-react";
+import { primaryButton } from "@/components/ui";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import type { Appointment, ClientOption, Member } from "@/lib/planning/types";
+import type { ProjectOption } from "@/lib/projects/types";
 import { VIEWS, type PlanningRange, type PlanningView } from "@/lib/planning/time";
 import { TimeGrid } from "./time-grid";
 import { MonthGrid } from "./month-grid";
 import { SidePanel, type Selection } from "./side-panel";
+import { planningHref } from "./links";
 
 const VIEW_LABELS: Record<PlanningView, string> = {
   jour: "Jour",
   semaine: "Semaine",
   mois: "Mois",
 };
-
-export function planningHref(view: PlanningView, date: string, rdv?: string | null) {
-  const p = new URLSearchParams({ vue: view, date });
-  if (rdv) p.set("rdv", rdv);
-  return `/dashboard/planning?${p.toString()}`;
-}
 
 function addHour(time: string) {
   const [h, m] = time.split(":").map(Number);
@@ -32,6 +30,7 @@ export function Planning({
   appointments,
   members,
   clients,
+  projects,
   initialSelected,
 }: {
   range: PlanningRange;
@@ -39,6 +38,7 @@ export function Planning({
   appointments: Appointment[];
   members: Member[];
   clients: ClientOption[];
+  projects: ProjectOption[] | null;
   initialSelected: string | null;
 }) {
   const memberMap = useMemo(() => new Map(members.map((m) => [m.userId, m])), [members]);
@@ -85,14 +85,14 @@ export function Planning({
             aria-label="Période précédente"
             className="text-muted hover:bg-violet-pale hover:text-violet grid size-9 place-items-center rounded-full text-lg"
           >
-            ‹
+            <ChevronLeft aria-hidden size={18} />
           </Link>
           <Link
             href={planningHref(range.view, range.next)}
             aria-label="Période suivante"
             className="text-muted hover:bg-violet-pale hover:text-violet grid size-9 place-items-center rounded-full text-lg"
           >
-            ›
+            <ChevronRight aria-hidden size={18} />
           </Link>
         </div>
         <h1 className="font-display mr-auto text-xl font-extrabold sm:text-2xl">{range.title}</h1>
@@ -116,9 +116,10 @@ export function Planning({
         <button
           type="button"
           onClick={() => create(range.view === "mois" ? today : range.anchor, "10:00")}
-          className="bg-violet shadow-soft hover:bg-violet-dark rounded-xl px-4 py-2 font-semibold text-white"
+          className={primaryButton}
         >
-          ＋ Créer
+          <Plus aria-hidden size={17} />
+          Créer
         </button>
       </div>
 
@@ -169,6 +170,7 @@ export function Planning({
               members={members}
               memberMap={memberMap}
               clients={clients}
+              projects={projects}
               onClose={() => select(null)}
               onEdit={(id) => select({ mode: "edit", id })}
               onView={(id) => select({ mode: "view", id })}

@@ -6,7 +6,7 @@ import type { Appointment, Member } from "@/lib/planning/types";
 import { dayLabel, STUDIO_TZ } from "@/lib/planning/time";
 import { layoutDay } from "./layout-events";
 import { colorFor } from "./colors";
-import { planningHref } from "./planning";
+import { planningHref } from "./links";
 
 const HOUR = 48; // hauteur d'une heure en px
 const HOURS = Array.from({ length: 24 }, (_, h) => h);
