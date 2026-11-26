@@ -11,35 +11,40 @@ export const NAV = [
   { href: "/dashboard/devis", label: "Devis & paiements", icon: "€" },
   { href: "/dashboard/apres-soin", label: "Suivi après-soin", icon: "♡" },
   { href: "/dashboard/equipe", label: "Équipe", icon: "☷" },
+  { href: "/dashboard/site", label: "Site public", icon: "◎", siteEditorsOnly: true },
   { href: "/dashboard/reglages", label: "Réglages", icon: "⚙" },
-] as const;
+] as const satisfies readonly NavItem[];
 
-export function Nav() {
+type NavItem = { href: string; label: string; icon: string; siteEditorsOnly?: boolean };
+
+export function Nav({ canEditSite }: { canEditSite: boolean }) {
   const pathname = usePathname();
   return (
     <nav aria-label="Navigation principale" className="flex gap-1 overflow-x-auto lg:grid">
-      {NAV.map((item) => {
-        const active =
-          item.href === "/dashboard" ? pathname === "/dashboard" : pathname.startsWith(item.href);
-        return (
-          <Link
-            key={item.href}
-            href={item.href}
-            aria-current={active ? "page" : undefined}
-            className={`flex shrink-0 items-center gap-3 rounded-xl px-3.5 py-3 text-[13px] whitespace-nowrap transition ${
-              active ? "bg-violet-pale text-violet-ink font-bold" : "hover:bg-wash text-muted"
-            }`}
-          >
-            <span
-              aria-hidden
-              className={`w-5 text-center text-lg ${active ? "text-violet" : "text-[#a28aa8]"}`}
+      {(NAV as readonly NavItem[])
+        .filter((item) => canEditSite || !item.siteEditorsOnly)
+        .map((item) => {
+          const active =
+            item.href === "/dashboard" ? pathname === "/dashboard" : pathname.startsWith(item.href);
+          return (
+            <Link
+              key={item.href}
+              href={item.href}
+              aria-current={active ? "page" : undefined}
+              className={`flex shrink-0 items-center gap-3 rounded-xl px-3.5 py-3 text-[13px] whitespace-nowrap transition ${
+                active ? "bg-violet-pale text-violet-ink font-bold" : "hover:bg-wash text-muted"
+              }`}
             >
-              {item.icon}
-            </span>
-            {item.label}
-          </Link>
-        );
-      })}
+              <span
+                aria-hidden
+                className={`w-5 text-center text-lg ${active ? "text-violet" : "text-[#a28aa8]"}`}
+              >
+                {item.icon}
+              </span>
+              {item.label}
+            </Link>
+          );
+        })}
     </nav>
   );
 }

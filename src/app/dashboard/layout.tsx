@@ -4,7 +4,7 @@ import { Nav } from "@/components/nav";
 import { StudioSwitcher } from "@/components/studio-switcher";
 import { requireStudio } from "@/lib/auth/dal";
 import { signOut } from "@/lib/auth/actions";
-import { ROLE_LABELS } from "@/lib/roles";
+import { canEditSite, ROLE_LABELS } from "@/lib/roles";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { themeAttr } from "@/lib/theme";
 import { readTheme } from "@/lib/theme-server";
@@ -28,7 +28,7 @@ export default async function AppLayout({ children }: LayoutProps<"/dashboard">)
           <Brand />
         </Link>
         <div className="eyebrow mb-3 hidden px-3 lg:block">{current.studioName}</div>
-        <Nav />
+        <Nav canEditSite={canEditSite(current.role)} />
         <div className="border-line mt-4 grid gap-3 border-t pt-4 lg:mt-auto">
           <StudioSwitcher studios={studios} currentId={current.studioId} />
           <ThemeToggle initial={theme} />
@@ -51,21 +51,7 @@ export default async function AppLayout({ children }: LayoutProps<"/dashboard">)
         </div>
       </aside>
 
-      <main className="flex-1 px-4 py-6 sm:px-8 lg:ml-62 lg:py-10">
-        <div className="border-line bg-paper mb-8 flex gap-3 rounded-2xl border p-4 text-xs">
-          <span aria-hidden className="text-violet">
-            ✦
-          </span>
-          <p>
-            <strong className="text-ink block">Environnement de développement</strong>
-            <span className="text-muted">
-              Utilise uniquement des données de test jusqu&apos;à validation complète de la sécurité
-              et des règles d&apos;accès.
-            </span>
-          </p>
-        </div>
-        {children}
-      </main>
+      <main className="flex-1 px-4 py-6 sm:px-8 lg:ml-62 lg:py-10">{children}</main>
     </div>
   );
 }
