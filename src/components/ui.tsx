@@ -50,7 +50,7 @@ export function SubmitButton({
 type FieldBase = { label: string; name: string; error?: string; className?: string };
 
 const fieldClass = (error?: string) =>
-  `mt-1.5 w-full rounded-xl border bg-white px-3.5 py-3 text-sm outline-none transition focus:border-violet focus:ring-3 focus:ring-violet-pale ${error ? "border-danger" : "border-line"}`;
+  `mt-1.5 w-full rounded-xl border bg-paper px-3.5 py-3 text-sm outline-none transition focus:border-violet focus:ring-3 focus:ring-violet-pale ${error ? "border-danger" : "border-line"}`;
 
 function FieldShell({
   label,
@@ -132,7 +132,7 @@ export function FormMessage({ message, ok }: { message?: string; ok?: boolean })
     <p
       role="status"
       aria-live="polite"
-      className={`rounded-xl px-3.5 py-3 text-sm ${ok ? "text-mint bg-[#eaf5f0]" : "text-danger bg-[#fbeef1]"}`}
+      className={`rounded-xl px-3.5 py-3 text-sm ${ok ? "text-mint bg-mint/10" : "text-danger bg-danger/10"}`}
     >
       {message}
     </p>

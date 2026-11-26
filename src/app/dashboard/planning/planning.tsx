@@ -106,7 +106,7 @@ export function Planning({
               href={planningHref(v, range.anchor)}
               aria-current={range.view === v ? "page" : undefined}
               className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition ${
-                range.view === v ? "bg-violet-pale text-violet-dark" : "text-muted hover:text-ink"
+                range.view === v ? "bg-violet-pale text-violet-ink" : "text-muted hover:text-ink"
               }`}
             >
               {VIEW_LABELS[v]}

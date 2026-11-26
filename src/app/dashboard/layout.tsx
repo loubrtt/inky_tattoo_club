@@ -5,13 +5,20 @@ import { StudioSwitcher } from "@/components/studio-switcher";
 import { requireStudio } from "@/lib/auth/dal";
 import { signOut } from "@/lib/auth/actions";
 import { ROLE_LABELS } from "@/lib/roles";
+import { ThemeToggle } from "@/components/theme-toggle";
+import { themeAttr } from "@/lib/theme";
+import { readTheme } from "@/lib/theme-server";
 
 export default async function AppLayout({ children }: LayoutProps<"/dashboard">) {
   const { user, studios, current } = await requireStudio();
   const initial = (user.email ?? "I").charAt(0).toUpperCase();
+  const theme = await readTheme();
 
   return (
-    <div className="flex min-h-full flex-1 flex-col lg:flex-row">
+    <div
+      data-theme={themeAttr(theme)}
+      className="app-theme flex min-h-full flex-1 flex-col lg:flex-row"
+    >
       <aside className="border-line bg-paper border-b px-4 py-4 lg:fixed lg:inset-y-0 lg:left-0 lg:flex lg:w-62 lg:flex-col lg:border-r lg:border-b-0 lg:px-4 lg:py-7">
         <Link
           href="/dashboard"
@@ -24,6 +31,7 @@ export default async function AppLayout({ children }: LayoutProps<"/dashboard">)
         <Nav />
         <div className="border-line mt-4 grid gap-3 border-t pt-4 lg:mt-auto">
           <StudioSwitcher studios={studios} currentId={current.studioId} />
+          <ThemeToggle initial={theme} />
           <div className="flex items-center gap-3 px-1">
             <span className="bg-violet-pale text-violet grid size-9 shrink-0 place-items-center rounded-full font-bold">
               {initial}
@@ -44,7 +52,7 @@ export default async function AppLayout({ children }: LayoutProps<"/dashboard">)
       </aside>
 
       <main className="flex-1 px-4 py-6 sm:px-8 lg:ml-62 lg:py-10">
-        <div className="mb-8 flex gap-3 rounded-2xl border border-[#f0e9f2] bg-[#fbf7fc] p-4 text-xs">
+        <div className="border-line bg-paper mb-8 flex gap-3 rounded-2xl border p-4 text-xs">
           <span aria-hidden className="text-violet">
             ✦
           </span>

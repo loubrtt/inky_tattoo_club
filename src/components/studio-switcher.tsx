@@ -18,7 +18,7 @@ export function StudioSwitcher({
         id="studio-switch"
         name="studioId"
         defaultValue={currentId}
-        className="border-line min-w-0 flex-1 rounded-lg border bg-white px-2 py-1.5 text-xs"
+        className="border-line bg-paper min-w-0 flex-1 rounded-lg border px-2 py-1.5 text-xs"
       >
         {studios.map((s) => (
           <option key={s.studioId} value={s.studioId}>

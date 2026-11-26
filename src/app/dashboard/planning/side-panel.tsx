@@ -113,8 +113,8 @@ function Details({ appt, memberMap, onEdit, onClose }: Props & { appt: Appointme
         <span className="h-10 w-1.5 rounded-full" style={{ backgroundColor: c.border }} />
         <div>
           <span
-            className="inline-block rounded-full px-2.5 py-0.5 text-[11px] font-semibold"
-            style={{ backgroundColor: c.bg, color: c.text }}
+            className="ev inline-block rounded-full px-2.5 py-0.5 text-[11px] font-semibold"
+            style={{ backgroundColor: c.bg, color: c.text, ["--ev" as string]: c.border }}
           >
             {KIND_LABELS[appt.kind]}
           </span>
@@ -177,7 +177,7 @@ function Details({ appt, memberMap, onEdit, onClose }: Props & { appt: Appointme
           <button
             type="button"
             onClick={() => setConfirming(true)}
-            className="border-line text-danger rounded-xl border px-4 py-2.5 font-semibold hover:bg-[#fbeef1]"
+            className="border-line text-danger hover:bg-danger/10 rounded-xl border px-4 py-2.5 font-semibold"
           >
             Supprimer
           </button>

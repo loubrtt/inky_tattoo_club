@@ -34,7 +34,7 @@ export default async function SettingsPage() {
               <strong className="block">{r.label}</strong>
               <small className="text-muted">{r.hint}</small>
             </span>
-            <b className="text-violet-dark">{r.value}</b>
+            <b className="text-violet-ink">{r.value}</b>
           </div>
         ))}
         <div className="flex flex-wrap items-center justify-between gap-2 px-5 py-4">

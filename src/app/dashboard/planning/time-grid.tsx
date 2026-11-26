@@ -145,8 +145,8 @@ export function TimeGrid({
                       e.stopPropagation();
                       onSelect(appt.id);
                     }}
-                    className={`absolute overflow-hidden rounded-lg border-l-4 px-2 py-1 text-left text-[11px] leading-tight transition hover:z-20 hover:shadow-md focus-visible:z-20 ${
-                      selected ? "z-20 shadow-lg ring-2 ring-offset-1" : ""
+                    className={`ev absolute overflow-hidden rounded-lg border-l-4 px-2 py-1 text-left text-[11px] leading-tight transition hover:z-20 hover:shadow-md focus-visible:z-20 ${
+                      selected ? "ring-offset-paper z-20 shadow-lg ring-2 ring-offset-1" : ""
                     } ${appt.kind === "unavailable" ? "bg-[repeating-linear-gradient(135deg,transparent_0,transparent_6px,rgba(0,0,0,0.04)_6px,rgba(0,0,0,0.04)_12px)]" : ""}`}
                     style={{
                       top: (appt.startMin / 60) * HOUR + 1,
@@ -156,6 +156,7 @@ export function TimeGrid({
                       backgroundColor: c.bg,
                       borderColor: c.border,
                       color: c.text,
+                      ["--ev" as string]: c.border,
                       ["--tw-ring-color" as string]: c.border,
                     }}
                   >
