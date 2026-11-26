@@ -272,7 +272,7 @@ html:has(.landing)::-webkit-scrollbar-thumb:hover {
   background: var(--color-flash);
 }
 
-/* Landing : glitch du grand titre, qui passe en gothique pendant l'éclat.
+/* Landing : glitch du grand titre (calques superposés au vrai texte).
    Les calques sont invisibles par défaut : sans animation, seul le vrai texte s'affiche. */
 .landing .glitch-layer {
   position: absolute;
@@ -286,135 +286,616 @@ html:has(.landing)::-webkit-scrollbar-thumb:hover {
   user-select: none;
 }
 
-@keyframes glitch-base {
+/* Variantes de glitch, jouées une fois (≈ 0,5 s) quand le script pose data-glitch sur
+   le titre : gothique, rgb, dechirure, flash. Pas de mouvement réduit = rien. */
+
+/* rgb, dechirure : les calques gardent la police du titre. */
+.landing .glitch:is([data-glitch="rgb"], [data-glitch="dechirure"]) .glitch-layer {
+  font-family: inherit;
+  font-weight: inherit;
+  letter-spacing: inherit;
+}
+
+/* 1. Gothique : bascule en gothique, tranches roses et claires décalées. */
+@keyframes g-gothique-base {
   0%,
-  9%,
   100% {
     opacity: 1;
     translate: 0 0;
   }
-  1% {
+  12% {
     opacity: 0;
   }
-  2.5% {
+  30% {
     opacity: 1;
     translate: -4px 0;
   }
-  3.5% {
+  42% {
     opacity: 0;
     translate: 0 0;
   }
-  8% {
+  95% {
     opacity: 1;
     translate: 3px 0;
   }
 }
-@keyframes glitch-goth {
+@keyframes g-gothique-goth {
   0%,
   100% {
     opacity: 0;
     translate: 0 0;
   }
-  1% {
+  12% {
     opacity: 1;
   }
-  2.5% {
+  30% {
     opacity: 0;
   }
-  3.5% {
+  42% {
     opacity: 1;
     translate: 2px 0;
   }
-  5% {
+  60% {
     translate: -3px 0;
   }
-  6.5% {
+  80% {
     translate: 1px 0;
   }
-  8% {
+  95% {
     opacity: 0;
     translate: 0 0;
   }
 }
-@keyframes glitch-slice-a {
+@keyframes g-slices-a {
   0%,
   100% {
     opacity: 0;
     clip-path: inset(0 0 100% 0);
     translate: 0 0;
   }
-  1% {
+  12% {
     opacity: 0.9;
     clip-path: inset(10% 0 62% 0);
     translate: -10px 0;
   }
-  2% {
+  25% {
     clip-path: inset(55% 0 22% 0);
     translate: 7px 0;
   }
-  3.5% {
+  42% {
     clip-path: inset(30% 0 48% 0);
     translate: -5px 0;
   }
-  5% {
+  60% {
     clip-path: inset(72% 0 6% 0);
     translate: 12px 0;
   }
-  6.5% {
+  80% {
     clip-path: inset(4% 0 82% 0);
     translate: -7px 0;
   }
-  8% {
+  95% {
     opacity: 0;
   }
 }
-@keyframes glitch-slice-b {
+@keyframes g-slices-b {
   0%,
   100% {
     opacity: 0;
     clip-path: inset(0 0 100% 0);
     translate: 0 0;
   }
-  1.5% {
+  18% {
     opacity: 0.55;
     clip-path: inset(68% 0 12% 0);
     translate: 9px 0;
   }
-  3% {
+  36% {
     clip-path: inset(20% 0 64% 0);
     translate: -12px 0;
   }
-  4.5% {
+  55% {
     clip-path: inset(44% 0 38% 0);
     translate: 5px 0;
   }
-  6% {
+  72% {
     clip-path: inset(84% 0 2% 0);
     translate: -4px 0;
   }
-  7.5% {
+  90% {
     opacity: 0;
   }
 }
 
+/* 2. RVB : dédoublement rose / blanc qui tremble autour du titre. */
+@keyframes g-rgb-base {
+  0%,
+  100% {
+    translate: 0 0;
+    skew: 0;
+  }
+  20% {
+    translate: 2px 0;
+    skew: -2deg;
+  }
+  45% {
+    translate: -3px 0;
+    skew: 1deg;
+  }
+  70% {
+    translate: 1px 0;
+    skew: 0;
+  }
+}
+@keyframes g-rgb-a {
+  0%,
+  100% {
+    opacity: 0;
+    translate: 0 0;
+  }
+  8% {
+    opacity: 0.85;
+    translate: -8px 2px;
+  }
+  30% {
+    translate: -4px -1px;
+  }
+  52% {
+    translate: -11px 0;
+  }
+  74% {
+    translate: -3px 1px;
+  }
+  92% {
+    opacity: 0;
+  }
+}
+@keyframes g-rgb-b {
+  0%,
+  100% {
+    opacity: 0;
+    translate: 0 0;
+  }
+  8% {
+    opacity: 0.5;
+    translate: 7px -2px;
+  }
+  30% {
+    translate: 3px 1px;
+  }
+  52% {
+    translate: 10px 0;
+  }
+  74% {
+    translate: 2px -1px;
+  }
+  92% {
+    opacity: 0;
+  }
+}
+
+/* 3. Déchirure : bandes du titre qui glissent et se penchent. */
+@keyframes g-dechirure-base {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  20% {
+    opacity: 0.25;
+  }
+  40% {
+    opacity: 1;
+  }
+  60% {
+    opacity: 0.25;
+  }
+  80% {
+    opacity: 1;
+  }
+}
+@keyframes g-dechirure-a {
+  0%,
+  100% {
+    opacity: 0;
+    clip-path: inset(0 0 100% 0);
+    translate: 0 0;
+    skew: 0;
+  }
+  10% {
+    opacity: 1;
+    clip-path: inset(0 0 58% 0);
+    translate: 28px 0;
+    skew: -8deg;
+  }
+  35% {
+    clip-path: inset(0 0 40% 0);
+    translate: -18px 0;
+    skew: 6deg;
+  }
+  60% {
+    clip-path: inset(0 0 66% 0);
+    translate: 36px 0;
+    skew: -4deg;
+  }
+  85% {
+    opacity: 0;
+  }
+}
+@keyframes g-dechirure-b {
+  0%,
+  100% {
+    opacity: 0;
+    clip-path: inset(100% 0 0 0);
+    translate: 0 0;
+    skew: 0;
+  }
+  10% {
+    opacity: 1;
+    clip-path: inset(46% 0 0 0);
+    translate: -30px 0;
+    skew: 7deg;
+  }
+  35% {
+    clip-path: inset(62% 0 0 0);
+    translate: 16px 0;
+    skew: -5deg;
+  }
+  60% {
+    clip-path: inset(38% 0 0 0);
+    translate: -24px 0;
+    skew: 3deg;
+  }
+  85% {
+    opacity: 0;
+  }
+}
+
+/* 4. Flash gothique : le titre passe franchement en gothique avec une ombre rose. */
+@keyframes g-flash-base {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  6%,
+  88% {
+    opacity: 0;
+  }
+}
+@keyframes g-flash-goth {
+  0%,
+  100% {
+    opacity: 0;
+    scale: 1;
+  }
+  6% {
+    opacity: 1;
+    scale: 1.04;
+  }
+  30% {
+    scale: 0.98;
+  }
+  55% {
+    scale: 1.02;
+  }
+  88% {
+    opacity: 0;
+    scale: 1;
+  }
+}
+@keyframes g-flash-shadow {
+  0%,
+  100% {
+    opacity: 0;
+    translate: 0 0;
+  }
+  6% {
+    opacity: 0.8;
+    translate: 8px 6px;
+  }
+  45% {
+    translate: -6px 4px;
+  }
+  88% {
+    opacity: 0;
+    translate: 0 0;
+  }
+}
+
 @media (prefers-reduced-motion: no-preference) {
-  .landing .glitch > * {
-    animation-duration: 5s;
-    animation-delay: 1.6s;
-    animation-iteration-count: infinite;
+  .landing .glitch[data-glitch] > * {
+    animation-duration: 520ms;
     animation-timing-function: steps(1, end);
+    animation-fill-mode: both;
   }
-  .landing .glitch-base {
-    animation-name: glitch-base;
-  }
-  .landing .glitch-goth {
-    animation-name: glitch-goth;
-  }
-  .landing .glitch-slice-a {
-    animation-name: glitch-slice-a;
-  }
-  .landing .glitch-slice-b {
-    animation-name: glitch-slice-b;
+  .landing .glitch[data-glitch] .glitch-slice-b {
     mix-blend-mode: screen;
+  }
+
+  .landing .glitch[data-glitch="gothique"] .glitch-base {
+    animation-name: g-gothique-base;
+  }
+  .landing .glitch[data-glitch="gothique"] .glitch-goth {
+    animation-name: g-gothique-goth;
+  }
+  .landing .glitch[data-glitch="gothique"] .glitch-slice-a {
+    animation-name: g-slices-a;
+  }
+  .landing .glitch[data-glitch="gothique"] .glitch-slice-b {
+    animation-name: g-slices-b;
+  }
+
+  .landing .glitch[data-glitch="rgb"] .glitch-base {
+    animation-name: g-rgb-base;
+  }
+  .landing .glitch[data-glitch="rgb"] .glitch-slice-a {
+    animation-name: g-rgb-a;
+  }
+  .landing .glitch[data-glitch="rgb"] .glitch-slice-b {
+    animation-name: g-rgb-b;
+  }
+
+  .landing .glitch[data-glitch="dechirure"] .glitch-base {
+    animation-name: g-dechirure-base;
+  }
+  .landing .glitch[data-glitch="dechirure"] .glitch-slice-a {
+    animation-name: g-dechirure-a;
+  }
+  .landing .glitch[data-glitch="dechirure"] .glitch-slice-b {
+    animation-name: g-dechirure-b;
+  }
+
+  .landing .glitch[data-glitch="flash"] .glitch-base {
+    animation-name: g-flash-base;
+  }
+  .landing .glitch[data-glitch="flash"] .glitch-goth {
+    animation-name: g-flash-goth;
+  }
+  .landing .glitch[data-glitch="flash"] .glitch-slice-a {
+    animation-name: g-flash-shadow;
+  }
+}
+
+/* ---------- Landing : effets « wouaou » ---------- */
+
+/* Grain argentique, fixe au-dessus du fond. */
+.landing .grain {
+  position: fixed;
+  pointer-events: none;
+  z-index: 60;
+  inset: -50%;
+  opacity: 0.07;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* Titre : diffusion d'encre. --ink vaut 200 % hors animation (titre entièrement visible). */
+@property --ink {
+  syntax: "<percentage>";
+  inherits: false;
+  initial-value: 200%;
+}
+@keyframes ink-spread {
+  from {
+    --ink: 0%;
+    opacity: 0;
+    filter: blur(18px);
+  }
+  25% {
+    opacity: 1;
+  }
+  to {
+    --ink: 200%;
+    opacity: 1;
+    filter: blur(0);
+  }
+}
+/* Le masque ne sert que pendant la diffusion : retiré ensuite pour ne pas rogner le glitch. */
+@keyframes ink-unmask {
+  to {
+    -webkit-mask-image: none;
+    mask-image: none;
+  }
+}
+
+/* Intro : invisible par défaut, jouée seulement si le mouvement est permis. */
+.landing .intro {
+  display: none;
+}
+
+@keyframes grain-shift {
+  0% {
+    translate: 0 0;
+  }
+  20% {
+    translate: -4% 3%;
+  }
+  40% {
+    translate: 3% -5%;
+  }
+  60% {
+    translate: -6% -2%;
+  }
+  80% {
+    translate: 5% 4%;
+  }
+  100% {
+    translate: 0 0;
+  }
+}
+@keyframes intro-heart {
+  0% {
+    opacity: 0;
+    scale: 0.5;
+  }
+  12% {
+    opacity: 1;
+    scale: 1;
+  }
+  22% {
+    scale: 1.32;
+  }
+  32% {
+    scale: 0.94;
+  }
+  42% {
+    scale: 1.2;
+  }
+  54% {
+    opacity: 1;
+    scale: 1;
+  }
+  100% {
+    opacity: 0;
+    scale: 16;
+  }
+}
+@keyframes intro-bloom {
+  0% {
+    opacity: 0;
+    scale: 0.4;
+  }
+  22% {
+    opacity: 1;
+    scale: 1.15;
+  }
+  32% {
+    opacity: 0.6;
+    scale: 0.9;
+  }
+  42% {
+    opacity: 1;
+    scale: 1.1;
+  }
+  54% {
+    opacity: 0.8;
+    scale: 1;
+  }
+  100% {
+    opacity: 0;
+    scale: 6;
+  }
+}
+/* Trou en forme de cœur qui s'agrandit dans l'écran noir. */
+@keyframes intro-hole {
+  from {
+    -webkit-mask-size:
+      0 0,
+      auto;
+    mask-size:
+      0 0,
+      auto;
+  }
+  to {
+    -webkit-mask-size:
+      420vmax 420vmax,
+      auto;
+    mask-size:
+      420vmax 420vmax,
+      auto;
+  }
+}
+@keyframes intro-done {
+  to {
+    visibility: hidden;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .landing .grain {
+    animation: grain-shift 1.2s steps(5) infinite;
+  }
+
+  .landing .ink-in {
+    -webkit-mask-image:
+      radial-gradient(var(--ink) var(--ink) at 14% 62%, #000 55%, transparent 100%),
+      radial-gradient(
+        calc(var(--ink) * 0.8) calc(var(--ink) * 0.8) at 52% 30%,
+        #000 55%,
+        transparent 100%
+      ),
+      radial-gradient(
+        calc(var(--ink) * 0.9) calc(var(--ink) * 0.9) at 86% 72%,
+        #000 55%,
+        transparent 100%
+      );
+    mask-image:
+      radial-gradient(var(--ink) var(--ink) at 14% 62%, #000 55%, transparent 100%),
+      radial-gradient(
+        calc(var(--ink) * 0.8) calc(var(--ink) * 0.8) at 52% 30%,
+        #000 55%,
+        transparent 100%
+      ),
+      radial-gradient(
+        calc(var(--ink) * 0.9) calc(var(--ink) * 0.9) at 86% 72%,
+        #000 55%,
+        transparent 100%
+      );
+    animation:
+      ink-spread 1700ms cubic-bezier(0.2, 0, 0, 1) 250ms both,
+      ink-unmask 1ms linear 1950ms forwards;
+  }
+
+  .landing .intro {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+    pointer-events: none;
+    background: #050405;
+    /* Écran noir percé d'un cœur (penché comme celui de la souris), de taille 0 au départ. */
+    --heart-hole: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath transform='rotate(12 12 12)' d='M12 21s-7.5-4.6-10-9.3C.3 8.4 2 4.5 5.7 4.1 8.2 3.8 10 5.3 12 7.4c2-2.1 3.8-3.6 6.3-3.3 3.7.4 5.4 4.3 3.7 7.6C19.5 16.4 12 21 12 21z'/%3E%3C/svg%3E");
+    -webkit-mask:
+      var(--heart-hole) center / 0 0 no-repeat,
+      linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask:
+      var(--heart-hole) center / 0 0 no-repeat,
+      linear-gradient(#000 0 0);
+    mask-composite: exclude;
+    animation:
+      intro-hole 1000ms cubic-bezier(0.7, 0, 0.25, 1) 1150ms both,
+      intro-done 1ms linear 2150ms forwards;
+  }
+  .landing .intro-heart,
+  .landing .intro-bloom {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+  }
+  .landing .intro-heart {
+    width: 120px;
+    height: 120px;
+    margin: -60px 0 0 -60px;
+    rotate: 12deg;
+    color: #8e1238;
+    filter: drop-shadow(0 0 18px rgb(176 20 64 / 0.55)) drop-shadow(0 0 70px rgb(120 10 40 / 0.4));
+    animation: intro-heart 2100ms cubic-bezier(0.3, 0, 0.1, 1) both;
+  }
+  .landing .intro-bloom {
+    width: 70vmin;
+    height: 70vmin;
+    margin: -35vmin 0 0 -35vmin;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgb(120 10 40 / 0.28), transparent 65%);
+    animation: intro-bloom 2100ms cubic-bezier(0.3, 0, 0.1, 1) both;
+  }
+
+  /* Pendant l'intro, le hero et l'encre attendent l'ouverture du cœur. */
+  .landing .hero-in {
+    animation-delay: calc(var(--i, 0) * 110ms + 1450ms);
+  }
+  .landing .ink-in {
+    animation-delay: 1300ms, 3000ms;
+  }
+
+  @supports (animation-timeline: view()) {
+    /* Présentation du studio : la section défile, le texte fixé s'allume mot par mot. */
+    .landing .lit-studio {
+      view-timeline-name: --studio;
+    }
+    .landing .lit-word--studio {
+      animation: landing-light linear both;
+      animation-timeline: --studio;
+      animation-range: contain var(--from) contain var(--to);
+    }
   }
 }

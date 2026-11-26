@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import {
   CalendarDays,
   Contact,
+  Globe,
   HeartHandshake,
   LayoutDashboard,
   PenTool,
@@ -14,7 +15,17 @@ import {
   type LucideIcon,
 } from "lucide-react";
 
-export const NAV: readonly { href: string; label: string; icon: LucideIcon; money?: boolean }[] = [
+type NavItem = {
+  href: string;
+  label: string;
+  icon: LucideIcon;
+  // money : masqué aux assistants ; siteEditorsOnly : owner et admin seulement.
+  // Simple confort d'affichage : la base revérifie les droits.
+  money?: boolean;
+  siteEditorsOnly?: boolean;
+};
+
+export const NAV: readonly NavItem[] = [
   { href: "/dashboard", label: "Vue d’ensemble", icon: LayoutDashboard },
   { href: "/dashboard/planning", label: "Planning", icon: CalendarDays },
   { href: "/dashboard/clients", label: "Clients", icon: Contact },
@@ -22,15 +33,18 @@ export const NAV: readonly { href: string; label: string; icon: LucideIcon; mone
   { href: "/dashboard/devis", label: "Devis et paiements", icon: Receipt, money: true },
   { href: "/dashboard/apres-soin", label: "Suivi après-soin", icon: HeartHandshake },
   { href: "/dashboard/equipe", label: "Équipe", icon: Users },
+  { href: "/dashboard/site", label: "Site public", icon: Globe, siteEditorsOnly: true },
   { href: "/dashboard/reglages", label: "Réglages", icon: Settings },
 ];
 
-// canSeeMoney : masque « Devis » aux assistants (la base refuse de toute façon les montants).
-export function Nav({ canSeeMoney }: { canSeeMoney: boolean }) {
+export function Nav({ canSeeMoney, canEditSite }: { canSeeMoney: boolean; canEditSite: boolean }) {
   const pathname = usePathname();
+  const items = NAV.filter(
+    (item) => (canSeeMoney || !item.money) && (canEditSite || !item.siteEditorsOnly),
+  );
   return (
     <nav aria-label="Navigation principale" className="flex gap-1 overflow-x-auto lg:grid">
-      {NAV.filter((item) => canSeeMoney || !item.money).map(({ href, label, icon: Icon }) => {
+      {items.map(({ href, label, icon: Icon }) => {
         const active = href === "/dashboard" ? pathname === href : pathname.startsWith(href);
         return (
           <Link

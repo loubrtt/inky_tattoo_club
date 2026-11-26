@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { APPOINTMENT_KINDS } from "@/lib/planning/types";
+import { INSTAGRAM_HANDLE, PHONE } from "@/lib/landing/content";
 import { STUDIO_ROLES } from "@/lib/supabase/types";
 import { THEMES } from "@/lib/theme";
 import { PROJECT_STATUSES } from "@/lib/projects/types";
@@ -68,6 +69,74 @@ export const appointmentSchema = z
     notes: optionalText(2000),
   })
   .refine((v) => v.end > v.start, { path: ["end"], message: "La fin doit être après le début." });
+
+// Site public (landing) : tout est facultatif, vide = « à compléter » sur la page.
+const instagramHandle = z
+  .string()
+  .trim()
+  .transform((v) => v.replace(/^@/, ""))
+  .refine(
+    (v) => v === "" || INSTAGRAM_HANDLE.test(v),
+    "Identifiant Instagram invalide (sans @ ni lien).",
+  )
+  .transform((v) => (v === "" ? null : v));
+
+const optionalEmail = z
+  .string()
+  .trim()
+  .toLowerCase()
+  .max(254)
+  .refine((v) => v === "" || z.email().safeParse(v).success, "Adresse e-mail invalide.")
+  .transform((v) => (v === "" ? null : v));
+
+const optionalPhone = z
+  .string()
+  .trim()
+  .refine((v) => v === "" || PHONE.test(v), "Numéro invalide.")
+  .transform((v) => (v === "" ? null : v));
+
+export const landingSchema = z.object({
+  tagline: optionalText(160),
+  intro: optionalText(600),
+  about: z.object({
+    title: optionalText(120),
+    text: optionalText(3000),
+    styles: z
+      .array(z.string().trim().min(1).max(40, "40 caractères maximum par style."))
+      .max(20, "20 styles maximum."),
+  }),
+  artists: z
+    .array(
+      z.object({
+        name: optionalText(80),
+        styles: optionalText(120),
+        bio: optionalText(600),
+        instagram: instagramHandle,
+      }),
+    )
+    .max(20, "20 artistes maximum."),
+  practical: z.object({
+    address: optionalText(160),
+    city: optionalText(120),
+    access: optionalText(600),
+    hours: z
+      .array(
+        z.object({
+          days: z.string().trim().min(1, "Jours requis.").max(40, "40 caractères maximum."),
+          hours: optionalText(40),
+        }),
+      )
+      .max(14, "14 lignes maximum."),
+  }),
+  booking: z.object({
+    text: optionalText(1000),
+    instagram: instagramHandle,
+    email: optionalEmail,
+    phone: optionalPhone,
+  }),
+});
+
+export type LandingInput = z.input<typeof landingSchema>;
 
 const role = z.enum(STUDIO_ROLES, "Rôle invalide.");
 const memberId = z.string().trim().pipe(z.uuid("Membre invalide."));
@@ -148,6 +217,16 @@ export function fieldErrors(error: z.ZodError): FieldErrors {
   const out: FieldErrors = {};
   for (const issue of error.issues) {
     const key = String(issue.path[0] ?? "form");
+    out[key] ??= issue.message;
+  }
+  return out;
+}
+
+// Erreurs indexées par chemin complet (« artists.0.instagram ») pour les formulaires imbriqués.
+export function nestedFieldErrors(error: z.ZodError): FieldErrors {
+  const out: FieldErrors = {};
+  for (const issue of error.issues) {
+    const key = issue.path.length ? issue.path.join(".") : "form";
     out[key] ??= issue.message;
   }
   return out;

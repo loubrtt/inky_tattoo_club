@@ -5,7 +5,7 @@ import { Nav } from "@/components/nav";
 import { StudioSwitcher } from "@/components/studio-switcher";
 import { requireStudio } from "@/lib/auth/dal";
 import { signOut } from "@/lib/auth/actions";
-import { canSeeMoney, ROLE_LABELS } from "@/lib/roles";
+import { canEditSite, canSeeMoney, ROLE_LABELS } from "@/lib/roles";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { themeAttr } from "@/lib/theme";
 import { readTheme } from "@/lib/theme-server";
@@ -31,7 +31,7 @@ export default async function AppLayout({ children }: LayoutProps<"/dashboard">)
         <div className="text-muted mb-2 hidden truncate px-3 text-xs font-semibold lg:block">
           {current.studioName}
         </div>
-        <Nav canSeeMoney={canSeeMoney(current.role)} />
+        <Nav canSeeMoney={canSeeMoney(current.role)} canEditSite={canEditSite(current.role)} />
         <div className="border-line mt-4 grid gap-3 border-t pt-4 lg:mt-auto">
           <StudioSwitcher studios={studios} currentId={current.studioId} />
           <ThemeToggle initial={theme} />

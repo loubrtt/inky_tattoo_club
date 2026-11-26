@@ -1,6 +1,6 @@
-// Contenu de la landing publique du studio.
-// Chaque valeur à `null` s'affiche sur la page comme un emplacement « À compléter ».
-// Rien ici ne doit contenir de donnée privée : cette page est visible par tout le monde.
+// Contenu de la landing publique d'un studio, modifiable dans le dashboard (« Site public »)
+// et stocké dans studio_sites.content. Chaque valeur à null s'affiche « à compléter ».
+// Tout ce qui est ici est PUBLIC : jamais de donnée privée.
 
 export type Artist = {
   name: string | null;
@@ -12,37 +12,42 @@ export type Artist = {
 
 export type OpeningHours = { days: string; hours: string | null };
 
-export const LANDING = {
-  studioName: "INKY TATTOO",
-  tagline: null as string | null,
-  intro: null as string | null,
-  about: {
-    title: null as string | null,
-    text: null as string | null,
-    styles: [] as string[],
-  },
-  artists: [
-    { name: null, styles: null, bio: null, instagram: null },
-    { name: null, styles: null, bio: null, instagram: null },
-    { name: null, styles: null, bio: null, instagram: null },
-  ] as Artist[],
+export type LandingContent = {
+  tagline: string | null;
+  intro: string | null;
+  about: { title: string | null; text: string | null; styles: string[] };
+  artists: Artist[];
   practical: {
-    address: null as string | null,
-    city: null as string | null,
-    access: null as string | null,
-    hours: [] as OpeningHours[],
-  },
+    address: string | null;
+    city: string | null;
+    access: string | null;
+    hours: OpeningHours[];
+  };
   booking: {
-    text: null as string | null,
-    instagram: null as string | null,
-    email: null as string | null,
-    phone: null as string | null,
-  },
+    text: string | null;
+    instagram: string | null;
+    email: string | null;
+    phone: string | null;
+  };
 };
 
-const INSTAGRAM_HANDLE = /^[A-Za-z0-9._]{1,30}$/;
-const EMAIL = /^[^\s@<>"]+@[^\s@<>"]+\.[^\s@<>"]+$/;
-const PHONE = /^\+?[0-9 .()-]{6,20}$/;
+// Nom affiché si la base ne répond pas.
+export const DEFAULT_STUDIO_NAME = "INKY TATTOO";
+
+export const EMPTY_ARTIST: Artist = { name: null, styles: null, bio: null, instagram: null };
+
+export const EMPTY_LANDING: LandingContent = {
+  tagline: null,
+  intro: null,
+  about: { title: null, text: null, styles: [] },
+  artists: [],
+  practical: { address: null, city: null, access: null, hours: [] },
+  booking: { text: null, instagram: null, email: null, phone: null },
+};
+
+export const INSTAGRAM_HANDLE = /^[A-Za-z0-9._]{1,30}$/;
+export const PHONE = /^\+?[0-9 .()-]{6,20}$/;
+const EMAIL = /^[^\s@<>"?]+@[^\s@<>"?]+\.[^\s@<>"?]+$/;
 
 /** Lien Instagram seulement si l'identifiant est propre, sinon null. */
 export function instagramUrl(handle: string | null | undefined): string | null {
