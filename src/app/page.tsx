@@ -6,6 +6,7 @@ import { getCurrentUser } from "@/lib/auth/dal";
 import { instagramUrl, mailtoUrl, telUrl } from "@/lib/landing/content";
 import { getPublicLanding } from "@/lib/landing/data";
 import { CursorLight } from "./cursor-light";
+import { GlitchTitle } from "./glitch-title";
 import { SmoothAnchors } from "./smooth-anchors";
 
 const playfair = Playfair_Display({
@@ -75,18 +76,21 @@ function ArrowIcon() {
 const order = (i: number) => ({ "--i": i }) as CSSProperties;
 
 // Titre dont les mots s'allument un à un pendant le scroll (voir .lit dans globals.css).
-function LitWords({ text }: { text: string }) {
+// Variante « studio » : suit le défilement de la section fixée (voir .lit-studio).
+function LitWords({ text, studio = false }: { text: string; studio?: boolean }) {
   const words = text.split(" ");
+  // Plage de défilement (en %) sur laquelle les mots s'allument, du premier au dernier.
+  const [start, span] = studio ? [5, 75] : [25, 25];
   return (
-    <span className="lit block">
+    <span className={studio ? "block" : "lit block"}>
       {words.map((w, i) => (
         <span
           key={`${w}-${i}`}
-          className="lit-word"
+          className={studio ? "lit-word lit-word--studio" : "lit-word"}
           style={
             {
-              "--from": `${25 + (i / words.length) * 25}%`,
-              "--to": `${25 + ((i + 1) / words.length) * 25 + 5}%`,
+              "--from": `${start + (i / words.length) * span}%`,
+              "--to": `${start + ((i + 1) / words.length) * span + 5}%`,
             } as CSSProperties
           }
         >
@@ -98,14 +102,29 @@ function LitWords({ text }: { text: string }) {
   );
 }
 
-function Section({ id, title, children }: { id: string; title: ReactNode; children: ReactNode }) {
+function Section({
+  id,
+  title,
+  children,
+  sticky = false,
+}: {
+  id: string;
+  title: ReactNode;
+  children: ReactNode;
+  sticky?: boolean;
+}) {
+  // sticky : la section s'allonge et son contenu reste à l'écran pendant la lecture,
+  // seulement si le navigateur gère les animations au scroll et que le mouvement est permis.
+  const tall = "lit-studio supports-[animation-timeline:view()]:motion-safe:min-h-[200vh]";
+  const pinned =
+    "supports-[animation-timeline:view()]:motion-safe:sticky supports-[animation-timeline:view()]:motion-safe:top-28";
   return (
     <section
       id={id}
       aria-labelledby={`${id}-titre`}
-      className="scroll-mt-20 px-5 py-24 outline-none sm:px-10 lg:py-40"
+      className={`scroll-mt-20 px-5 py-24 outline-none sm:px-10 lg:py-40 ${sticky ? tall : ""}`}
     >
-      <div className="mx-auto max-w-6xl">
+      <div className={`mx-auto max-w-6xl ${sticky ? pinned : ""}`}>
         <h2
           id={`${id}-titre`}
           className="font-editorial reveal text-5xl leading-none tracking-tight text-balance sm:text-7xl"
@@ -151,6 +170,8 @@ export default async function LandingPage() {
     : { href: "/connexion", text: "Espace équipe" };
   const { studioName, content } = await getPublicLanding();
   const { about, artists, practical, booking } = content;
+  // Section du studio fixée pendant la lecture seulement si le texte tient à l'écran.
+  const pinStudio = Boolean(about.text && about.text.length <= 600);
 
   return (
     <div
@@ -162,6 +183,18 @@ export default async function LandingPage() {
       >
         Aller au contenu
       </a>
+
+      {/* Intro à chaque chargement : le cœur bat puis s'ouvre et dévoile la page. */}
+      <div aria-hidden className="intro">
+        <div className="intro-bloom" />
+        <svg viewBox="0 0 24 24" className="intro-heart">
+          <path
+            fill="currentColor"
+            d="M12 21s-7.5-4.6-10-9.3C.3 8.4 2 4.5 5.7 4.1 8.2 3.8 10 5.3 12 7.4c2-2.1 3.8-3.6 6.3-3.3 3.7.4 5.4 4.3 3.7 7.6C19.5 16.4 12 21 12 21z"
+          />
+        </svg>
+      </div>
+      <div aria-hidden className="grain" />
 
       <CursorLight />
       <SmoothAnchors />
@@ -204,19 +237,8 @@ export default async function LandingPage() {
               Studio de tatouage
             </p>
             <h1 className="font-editorial hero-recede mt-6 text-[clamp(3rem,13vw,10rem)] leading-[0.88] font-black tracking-tight text-balance">
-              {/* Glitch périodique : le titre passe en gothique le temps d'un éclat (globals.css). */}
-              <span className="hero-in glitch relative block" style={order(1)}>
-                <span className="glitch-base block">{studioName}</span>
-                <span aria-hidden className="glitch-layer glitch-goth">
-                  {studioName}
-                </span>
-                <span aria-hidden className="glitch-layer glitch-slice-a text-flash">
-                  {studioName}
-                </span>
-                <span aria-hidden className="glitch-layer glitch-slice-b text-white">
-                  {studioName}
-                </span>
-              </span>
+              {/* Glitch périodique et au clic : le titre passe en gothique le temps d'un éclat. */}
+              <GlitchTitle text={studioName} />
             </h1>
             <div className="mt-12 grid gap-8 lg:grid-cols-2 lg:gap-16">
               <p
@@ -240,9 +262,13 @@ export default async function LandingPage() {
           </div>
         </section>
 
-        <Section id="studio" title={<Fill value={about.title} todo="titre" />}>
-          <div className="reveal max-w-4xl text-2xl leading-snug text-pretty whitespace-pre-line sm:text-3xl">
-            <Fill value={about.text} todo="texte de présentation du studio" block />
+        <Section id="studio" title={<Fill value={about.title} todo="titre" />} sticky={pinStudio}>
+          <div className="max-w-4xl text-2xl leading-snug text-pretty whitespace-pre-line sm:text-3xl">
+            {about.text ? (
+              <LitWords text={about.text} studio={pinStudio} />
+            ) : (
+              <Todo block>texte de présentation du studio</Todo>
+            )}
           </div>
           <p className="text-bone-dim reveal mt-10 max-w-3xl text-xl leading-relaxed text-pretty">
             {about.styles.length ? (
