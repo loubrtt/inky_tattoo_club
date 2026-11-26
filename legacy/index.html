@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#f7f3fa">
+  <meta name="description" content="INKY CLIENT — espace privé de gestion du studio INKY TATTOO.">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="stylesheet" href="styles.css">
+  <title>INKY CLIENT — Studio</title>
+</head>
+<body>
+  <section id="authScreen" class="auth-screen" aria-labelledby="authTitle">
+    <div class="auth-card">
+      <div class="auth-brand"><span class="brand-mark">i<span>♥</span></span><span><strong>INKY</strong><small>CLIENT</small></span></div>
+      <div class="eyebrow">ESPACE PRIVÉ DU STUDIO</div>
+      <h1 id="authTitle">Bienvenue <em>chez INKY.</em></h1>
+      <p class="auth-intro">Connecte-toi avec ton compte équipe pour accéder à l’espace du studio.</p>
+      <form id="loginForm" class="auth-form">
+        <label>Adresse e-mail<input id="loginEmail" type="email" autocomplete="username" required placeholder="toi@studio.fr"></label>
+        <label>Mot de passe<input id="loginPassword" type="password" autocomplete="current-password" required placeholder="Ton mot de passe"></label>
+        <button class="primary-button" id="loginButton" type="submit">Se connecter</button>
+      </form>
+      <button class="auth-link" id="resetPassword" type="button">Mot de passe oublié ?</button>
+      <p id="authMessage" class="auth-message" role="status" aria-live="polite">Connexion à l’espace de développement INKY CLIENT.</p>
+      <small class="auth-footnote">Accès réservé aux membres autorisés du studio.</small>
+    </div>
+  </section>
+
+  <div class="app-shell" id="appShell" hidden>
+    <aside class="sidebar" aria-label="Navigation principale">
+      <a class="brand" href="#accueil" aria-label="INKY CLIENT accueil">
+        <span class="brand-mark">i<span>♥</span></span>
+        <span><strong>INKY</strong><small>CLIENT</small></span>
+      </a>
+      <div class="studio-label">ESPACE STUDIO</div>
+      <nav class="nav-list">
+        <button class="nav-item active" data-page="accueil"><span>⌂</span>Vue d’ensemble</button>
+        <button class="nav-item" data-page="clients"><span>♙</span>Clients <b class="nav-count" id="clientNavCount">0</b></button>
+        <button class="nav-item" data-page="projets"><span>✳</span>Projets & séances</button>
+        <button class="nav-item" data-page="finances"><span>€</span>Devis & paiements</button>
+        <button class="nav-item" data-page="suivi"><span>♡</span>Suivi après-soin</button>
+      </nav>
+      <div class="sidebar-bottom">
+        <div class="safe-note"><span class="safe-icon">✦</span><div><strong>Un espace privé</strong><small>Conçu pour le studio</small></div></div>
+        <button class="nav-item" data-page="reglages"><span>⚙</span>Réglages</button>
+        <div class="profile"><div class="avatar" id="profileInitials">IK</div><div class="profile-copy"><strong id="profileName">Équipe INKY</strong><small id="profileRole">Membre du studio</small></div><button class="logout-button" id="logoutButton" type="button">Sortir</button></div>
+      </div>
+    </aside>
+
+    <main class="main-area">
+      <header class="topbar">
+        <div class="mobile-brand"><span class="brand-mark">i<span>♥</span></span><strong>INKY CLIENT</strong></div>
+        <div class="breadcrumb">Studio <span>/</span> <strong id="crumb">Vue d’ensemble</strong></div>
+        <div class="top-actions"><span class="status-pill"><i></i> Connecté · Développement</span><button class="icon-button" aria-label="Notifications">♧</button><div class="avatar small">IK</div></div>
+      </header>
+
+      <div class="demo-banner"><span>✦</span><div><strong>Environnement de développement</strong><p>La connexion et les fiches clients utilisent Supabase. Utilise uniquement des données de test jusqu’à validation complète de la sécurité et des règles d’accès.</p></div><button id="dismissBanner" aria-label="Fermer">×</button></div>
+
+      <section class="page active" id="page-accueil">
+        <div class="page-heading"><div><div class="eyebrow">MERCREDI 25 NOVEMBRE 2026</div><h1>Bonjour, <em>INKY.</em></h1><p class="subheading">Voici ce qui se passe au studio aujourd’hui.</p></div><button class="primary-button" data-action="new-client">＋ Nouveau client</button></div>
+        <div class="stats-grid">
+          <article class="stat-card"><div class="stat-top"><span>Clients enregistrés</span><span class="stat-icon lavender">♙</span></div><strong id="dashboardClientCount">—</strong><small>Fiches du studio</small></article>
+          <article class="stat-card"><div class="stat-top"><span>Projets en cours</span><span class="stat-icon pink">✳</span></div><strong>08</strong><small>3 projets multi-séances</small></article>
+          <article class="stat-card"><div class="stat-top"><span>Devis à suivre</span><span class="stat-icon grey">€</span></div><strong>03</strong><small>À confirmer manuellement</small></article>
+          <article class="stat-card"><div class="stat-top"><span>Suivis après-soin</span><span class="stat-icon mint">♡</span></div><strong>05</strong><small>Messages de suivi à prévoir</small></article>
+        </div>
+        <div class="content-grid">
+          <article class="panel agenda-panel"><div class="panel-heading"><div><div class="eyebrow">ORGANISATION</div><h2>À suivre</h2></div><span class="soft-tag">Aujourd’hui</span></div>
+            <div class="empty-agenda"><div class="empty-symbol">✦</div><strong>Aucun rendez-vous synchronisé</strong><p>INKY CLIENT ne gère pas la réservation en ligne. Ajoute et organise tes séances manuellement dans les projets.</p><button class="text-button" data-page="projets">Voir les projets <span>→</span></button></div>
+          </article>
+          <article class="panel quick-panel"><div class="panel-heading"><div><div class="eyebrow">ACCÈS RAPIDE</div><h2>Les essentiels</h2></div></div>
+            <button class="quick-link" data-action="new-client"><span class="quick-icon lavender">＋</span><span><strong>Créer une fiche client</strong><small>Coordonnées et projet</small></span><b>→</b></button>
+            <button class="quick-link" data-page="projets"><span class="quick-icon pink">✳</span><span><strong>Ouvrir les projets</strong><small>Séances et traçabilité</small></span><b>→</b></button>
+            <button class="quick-link" data-page="finances"><span class="quick-icon grey">€</span><span><strong>Suivre les paiements</strong><small>Devis, acomptes et soldes</small></span><b>→</b></button>
+          </article>
+        </div>
+        <div class="panel note-panel"><span class="note-star">✦</span><div><strong>La priorité : un dossier clair pour chaque client.</strong><p>Consentements distincts, projet, séances, encres et suivi après-soin : tout doit rester traçable, sans transformer l’accueil en parcours compliqué.</p></div></div>
+      </section>
+
+      <section class="page" id="page-clients">
+        <div class="page-heading"><div><div class="eyebrow">CARNET DU STUDIO</div><h1>Les <em>clients.</em></h1><p class="subheading">Retrouver et organiser les dossiers clients.</p></div><button class="primary-button" data-action="new-client">＋ Nouveau client</button></div>
+        <div class="toolbar"><label class="search-box"><span>⌕</span><input id="clientSearch" type="search" placeholder="Rechercher un client…"></label><span class="result-count" id="clientResultCount">Chargement…</span></div>
+        <div class="panel table-panel"><div class="table-head"><span>CLIENT</span><span>PROJET</span><span>DERNIÈRE ACTIVITÉ</span><span>STATUT</span><span></span></div><div id="clientRows"><div class="empty-clients">Les fiches du studio apparaîtront ici après chargement.</div></div></div>
+        <p class="footnote">Les fiches affichées sont limitées au studio auquel ton compte appartient.</p>
+      </section>
+
+      <section class="page" id="page-projets"><div class="page-heading"><div><div class="eyebrow">CRÉATION & RÉALISATION</div><h1>Projets <em>& séances.</em></h1><p class="subheading">Un projet peut contenir plusieurs séances et son historique.</p></div><button class="primary-button" data-action="new-project">＋ Nouveau projet</button></div><div class="feature-grid"><article class="feature-card"><span class="feature-icon pink">✳</span><h3>Fiche projet</h3><p>Zone du corps, dimensions, style, références, notes artistiques et statut.</p><span class="feature-state">Structure à connecter</span></article><article class="feature-card"><span class="feature-icon lavender">◷</span><h3>Séances</h3><p>Dates, durée, artiste, notes de séance et progression du projet.</p><span class="feature-state">Structure à connecter</span></article><article class="feature-card"><span class="feature-icon grey">⌁</span><h3>Traçabilité</h3><p>Encres, références et lots, consommables et matériel utilisés.</p><span class="feature-state">Structure à connecter</span></article></div></section>
+
+      <section class="page" id="page-finances"><div class="page-heading"><div><div class="eyebrow">SUIVI INTERNE</div><h1>Devis <em>& paiements.</em></h1><p class="subheading">Suivre les montants convenus, acomptes et soldes.</p></div><button class="primary-button" data-action="new-quote">＋ Préparer un devis</button></div><div class="notice-card"><span>€</span><div><strong>Pas de paiement par carte dans cette version.</strong><p>Le suivi est manuel : montant du devis, acompte reçu, paiements intermédiaires et solde restant. Aucun traitement bancaire n’est intégré.</p></div></div><div class="feature-grid"><article class="feature-card"><h3>Devis</h3><p>Montant convenu, date, durée estimée et conditions.</p><span class="feature-state">À construire</span></article><article class="feature-card"><h3>Acompte</h3><p>Montant et date de réception, avec justificatif si nécessaire.</p><span class="feature-state">À construire</span></article><article class="feature-card"><h3>Solde</h3><p>Historique des règlements et reste à percevoir.</p><span class="feature-state">À construire</span></article></div></section>
+
+      <section class="page" id="page-suivi"><div class="page-heading"><div><div class="eyebrow">ACCOMPAGNEMENT CLIENT</div><h1>Après-<em>soin.</em></h1><p class="subheading">Centraliser les consignes remises et le suivi après tatouage.</p></div></div><div class="notice-card"><span>♡</span><div><strong>Un suivi utile, sans automatisme intrusif.</strong><p>Prévoir une fiche de consignes remise au client, la date d’envoi et les éventuels retours. Les alertes et messages automatiques seront définis plus tard.</p></div></div><div class="feature-grid"><article class="feature-card"><h3>Consignes</h3><p>Version du document d’après-soin remise au client.</p></article><article class="feature-card"><h3>Suivi</h3><p>Date de contrôle et notes factuelles.</p></article><article class="feature-card"><h3>Historique</h3><p>Retours du client et actions de l’équipe.</p></article></div></section>
+
+      <section class="page" id="page-reglages"><div class="page-heading"><div><div class="eyebrow">CONFIGURATION</div><h1>Réglages <em>studio.</em></h1><p class="subheading">Les bases de l’espace INKY CLIENT.</p></div></div><div class="panel settings-panel"><div class="setting-row"><div><strong>Nom du studio</strong><small>Nom affiché dans l’application</small></div><b>INKY TATTOO</b></div><div class="setting-row"><div><strong>Accès</strong><small>Profils prévus</small></div><b>Administrateur · Artiste · Assistant</b></div><div class="setting-row"><div><strong>Mode client</strong><small>Accès ponctuel au formulaire d’accueil</small></div><b>À définir</b></div><div class="setting-row"><div><strong>Réservations en ligne</strong><small>Choix de conception</small></div><b class="no-online">Non prévu</b></div><div class="setting-row"><div><strong>Stockage des données</strong><small>À mettre en place avant tout usage réel</small></div><b>Supabase · environnement de développement</b></div></div></section>
+
+      <footer class="footer"><span>INKY CLIENT <b>♥</b></span><span>Développement privé · Connexion Supabase</span></footer>
+    </main>
+  </div>
+
+  <dialog id="clientDialog" class="modal"><form id="clientForm"><div class="modal-head"><div><div class="eyebrow">NOUVEAU DOSSIER</div><h2>Créer un client</h2></div><button class="close-button" type="button" id="closeClientDialog" aria-label="Fermer">×</button></div><p class="modal-warning">Environnement de développement : utilise uniquement une fiche de test. Les données de santé et documents sensibles ne sont pas pris en charge à ce stade.</p><div class="form-grid"><label>Prénom<input name="firstName" required maxlength="80" placeholder="Ex. Alex"></label><label>Nom<input name="lastName" required maxlength="80" placeholder="Ex. Martin"></label><label class="full">E-mail<input name="email" type="email" maxlength="254" placeholder="alex@example.test"></label><label class="full">Résumé du projet (facultatif)<textarea name="project" rows="3" maxlength="1000" placeholder="Résumé non sensible du projet…"></textarea></label></div><div class="modal-actions"><button class="secondary-button" type="button" id="cancelClient">Annuler</button><button class="primary-button" id="saveClient" type="submit">Enregistrer la fiche</button></div></form></dialog>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-config.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
