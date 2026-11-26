@@ -28,7 +28,7 @@ export function NewClientDialog({ label = "＋ Nouveau client" }: { label?: stri
       <dialog
         ref={dialog}
         aria-labelledby="new-client-title"
-        className="border-line shadow-soft backdrop:bg-ink/30 m-auto w-[calc(100%-2rem)] max-w-lg rounded-3xl border p-0"
+        className="border-line bg-paper text-ink shadow-soft m-auto w-[calc(100%-2rem)] max-w-lg rounded-3xl border p-0 backdrop:bg-black/40"
       >
         <ActionForm ref={form} action={action} className="grid gap-4 p-6">
           <div className="flex items-start justify-between">

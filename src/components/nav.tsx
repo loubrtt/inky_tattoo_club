@@ -10,6 +10,7 @@ export const NAV = [
   { href: "/dashboard/projets", label: "Projets & séances", icon: "✳" },
   { href: "/dashboard/devis", label: "Devis & paiements", icon: "€" },
   { href: "/dashboard/apres-soin", label: "Suivi après-soin", icon: "♡" },
+  { href: "/dashboard/equipe", label: "Équipe", icon: "☷" },
   { href: "/dashboard/site", label: "Site public", icon: "◎", siteEditorsOnly: true },
   { href: "/dashboard/reglages", label: "Réglages", icon: "⚙" },
 ] as const satisfies readonly NavItem[];
@@ -31,9 +32,7 @@ export function Nav({ canEditSite }: { canEditSite: boolean }) {
               href={item.href}
               aria-current={active ? "page" : undefined}
               className={`flex shrink-0 items-center gap-3 rounded-xl px-3.5 py-3 text-[13px] whitespace-nowrap transition ${
-                active
-                  ? "bg-violet-pale text-violet-dark font-bold"
-                  : "hover:bg-wash text-[#77717e]"
+                active ? "bg-violet-pale text-violet-ink font-bold" : "hover:bg-wash text-muted"
               }`}
             >
               <span

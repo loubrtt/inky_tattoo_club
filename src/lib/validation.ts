@@ -1,6 +1,8 @@
 import { z } from "zod";
 import { APPOINTMENT_KINDS } from "@/lib/planning/types";
 import { INSTAGRAM_HANDLE, PHONE } from "@/lib/landing/content";
+import { STUDIO_ROLES } from "@/lib/supabase/types";
+import { THEMES } from "@/lib/theme";
 
 const email = z.string().trim().toLowerCase().max(254).pipe(z.email("Adresse e-mail invalide."));
 
@@ -131,6 +133,17 @@ export const landingSchema = z.object({
 });
 
 export type LandingInput = z.input<typeof landingSchema>;
+
+const role = z.enum(STUDIO_ROLES, "Rôle invalide.");
+const memberId = z.string().trim().pipe(z.uuid("Membre invalide."));
+
+export const inviteMemberSchema = z.object({ email, role });
+
+export const memberRoleSchema = z.object({ userId: memberId, role });
+
+export const removeMemberSchema = z.object({ userId: memberId });
+
+export const themeSchema = z.enum(THEMES);
 
 export type FieldErrors = Partial<Record<string, string>>;
 

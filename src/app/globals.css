@@ -10,6 +10,8 @@
   --color-violet: #8d52a8;
   --color-violet-dark: #543a60;
   --color-violet-pale: #f1e8f6;
+  /* Texte violet appuyé (sur fond clair en mode clair, sur fond sombre en mode sombre). */
+  --color-violet-ink: #543a60;
   --color-pink: #f8e7f1;
   --color-rose: #bd6c98;
   --color-mint: #4b987b;
@@ -37,6 +39,75 @@
 body {
   background: var(--color-wash);
   color: var(--color-ink);
+}
+
+/* Mode sombre de l'appli (dashboard + pages de connexion, pas la landing).
+   .app-theme porte data-theme="dark" | "light" (choix enregistré) ou rien (= suit le système).
+   Les deux blocs ci-dessous doivent rester identiques. */
+.app-theme {
+  background: var(--color-wash);
+  color: var(--color-ink);
+}
+.app-theme[data-theme="dark"] {
+  color-scheme: dark;
+  --color-ink: #ece7f1;
+  --color-muted: #9c95a6;
+  --color-line: #2e2a33;
+  --color-paper: #1d1a21;
+  --color-wash: #141217;
+  --color-violet: #a46bc0;
+  --color-violet-dark: #8d52a8;
+  --color-violet-pale: #2f2338;
+  --color-violet-ink: #dcc3ea;
+  --color-pink: #3a2230;
+  --color-rose: #e092bd;
+  --color-mint: #6cc4a2;
+  --color-danger: #ec7a8f;
+  --shadow-soft: 0 12px 34px rgba(0, 0, 0, 0.35);
+}
+@media (prefers-color-scheme: dark) {
+  .app-theme:not([data-theme="light"]) {
+    color-scheme: dark;
+    --color-ink: #ece7f1;
+    --color-muted: #9c95a6;
+    --color-line: #2e2a33;
+    --color-paper: #1d1a21;
+    --color-wash: #141217;
+    --color-violet: #a46bc0;
+    --color-violet-dark: #8d52a8;
+    --color-violet-pale: #2f2338;
+    --color-violet-ink: #dcc3ea;
+    --color-pink: #3a2230;
+    --color-rose: #e092bd;
+    --color-mint: #6cc4a2;
+    --color-danger: #ec7a8f;
+    --shadow-soft: 0 12px 34px rgba(0, 0, 0, 0.35);
+  }
+}
+
+/* Fond de page (rebond du défilement, barres de défilement) accordé au thème sombre. */
+html:has(.app-theme[data-theme="dark"]) {
+  color-scheme: dark;
+  background: #141217;
+}
+@media (prefers-color-scheme: dark) {
+  html:has(.app-theme:not([data-theme="light"])) {
+    color-scheme: dark;
+    background: #141217;
+  }
+}
+
+/* Planning : en sombre, les pastels des rendez-vous sont recalculés à partir de la couleur
+   de l'artiste (--ev), pour rester lisibles sans éblouir. */
+.app-theme[data-theme="dark"] .ev {
+  background-color: color-mix(in srgb, var(--ev) 24%, var(--color-paper)) !important;
+  color: color-mix(in srgb, var(--ev) 30%, var(--color-ink)) !important;
+}
+@media (prefers-color-scheme: dark) {
+  .app-theme:not([data-theme="light"]) .ev {
+    background-color: color-mix(in srgb, var(--ev) 24%, var(--color-paper)) !important;
+    color: color-mix(in srgb, var(--ev) 30%, var(--color-ink)) !important;
+  }
 }
 
 .eyebrow {

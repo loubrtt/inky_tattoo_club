@@ -75,12 +75,13 @@ export function MonthGrid({
                         e.stopPropagation();
                         onSelect(a.id);
                       }}
-                      className={`flex items-center gap-1 truncate rounded px-1.5 py-0.5 text-left text-[11px] ${
+                      className={`ev flex items-center gap-1 truncate rounded px-1.5 py-0.5 text-left text-[11px] ${
                         a.id === selectedId ? "ring-2" : ""
                       }`}
                       style={{
                         backgroundColor: c.bg,
                         color: c.text,
+                        ["--ev" as string]: c.border,
                         ["--tw-ring-color" as string]: c.border,
                       }}
                     >
