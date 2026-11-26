@@ -2,12 +2,12 @@
 
 import { useActionState, useEffect, useRef } from "react";
 import { createClientRecord } from "@/lib/clients/actions";
-import { Field, FormMessage, SubmitButton, TextArea } from "@/components/ui";
+import { ActionForm, Field, FormMessage, SubmitButton, TextArea } from "@/components/ui";
 
 export function NewClientDialog({ label = "＋ Nouveau client" }: { label?: string }) {
   const dialog = useRef<HTMLDialogElement>(null);
   const form = useRef<HTMLFormElement>(null);
-  const [state, action] = useActionState(createClientRecord, {});
+  const [state, action, pending] = useActionState(createClientRecord, {});
 
   useEffect(() => {
     if (state.ok) {
@@ -30,7 +30,7 @@ export function NewClientDialog({ label = "＋ Nouveau client" }: { label?: stri
         aria-labelledby="new-client-title"
         className="border-line shadow-soft backdrop:bg-ink/30 m-auto w-[calc(100%-2rem)] max-w-lg rounded-3xl border p-0"
       >
-        <form ref={form} action={action} className="grid gap-4 p-6" noValidate>
+        <ActionForm ref={form} action={action} className="grid gap-4 p-6">
           <div className="flex items-start justify-between">
             <div>
               <div className="eyebrow">Nouveau dossier</div>
@@ -95,9 +95,11 @@ export function NewClientDialog({ label = "＋ Nouveau client" }: { label?: stri
             >
               Annuler
             </button>
-            <SubmitButton pendingLabel="Enregistrement…">Enregistrer la fiche</SubmitButton>
+            <SubmitButton pending={pending} pendingLabel="Enregistrement…">
+              Enregistrer la fiche
+            </SubmitButton>
           </div>
-        </form>
+        </ActionForm>
       </dialog>
     </>
   );
