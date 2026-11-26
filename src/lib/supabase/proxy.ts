@@ -2,8 +2,8 @@ import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import { publicEnv } from "@/lib/env";
 
-// Rafraîchit le jeton de session Supabase à chaque requête.
-// Ce n'est PAS un contrôle d'accès : les droits sont vérifiés côté serveur et par les RLS.
+// Rafraîchit le jeton de session Supabase à chaque requête et renvoie l'id utilisateur.
+// Ce n'est PAS un contrôle d'accès : les droits sont revérifiés côté serveur et par les RLS.
 export async function updateSession(request: NextRequest) {
   let response = NextResponse.next({ request });
 
@@ -27,7 +27,8 @@ export async function updateSession(request: NextRequest) {
   );
 
   // Ne rien exécuter entre createServerClient et getClaims().
-  await supabase.auth.getClaims();
+  const { data } = await supabase.auth.getClaims();
+  const userId = typeof data?.claims?.sub === "string" ? data.claims.sub : null;
 
-  return response;
+  return { response, userId };
 }

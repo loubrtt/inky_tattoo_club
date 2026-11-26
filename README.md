@@ -12,13 +12,18 @@ make dev                     # http://localhost:3000 (libère le port avant)
 
 ## Scripts
 
-`make help` liste tout : `make dev`, `make kill`, `make check`, `make build`…
+`make help` liste tout : `make dev`, `make kill`, `make check` (lint, types, format, tests), `make build`, `make db-pull`…
 
 ## Structure
 
-`src/app` pages (App Router), `src/lib/supabase` clients Supabase navigateur / serveur / proxy,
-`src/proxy.ts` rafraîchissement de session, `legacy/` prototype HTML/JS d'origine (référence
-pendant la migration), `docs/` contexte du projet.
+`src/app/(auth)` connexion, mot de passe oublié, nouveau mot de passe, compte sans studio.
+`src/app/(app)` écrans connectés : vue d'ensemble, clients, projets, devis, après-soin, réglages.
+`src/app/auth/confirm` arrivée des liens reçus par e-mail.
+`src/lib/auth/dal.ts` seul point d'accès à l'utilisateur et au studio actif (côté serveur).
+`src/lib/clients` lecture et création des fiches. `src/lib/validation.ts` schémas Zod.
+`src/proxy.ts` rafraîchit la session et renvoie vers `/connexion` si besoin.
+`supabase/` réglages et versionnage du schéma (voir `supabase/README.md`).
+`legacy/` prototype HTML/JS d'origine, `docs/` contexte du projet, `tests/` tests Vitest.
 
 ## Sécurité
 

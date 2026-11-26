@@ -1,26 +1,33 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* Palette reprise du prototype (legacy/styles.css). */
+@theme {
+  --color-ink: #24232a;
+  --color-muted: #85818d;
+  --color-line: #ece9ef;
+  --color-paper: #ffffff;
+  --color-wash: #faf8fb;
+  --color-violet: #8d52a8;
+  --color-violet-dark: #543a60;
+  --color-violet-pale: #f1e8f6;
+  --color-pink: #f8e7f1;
+  --color-rose: #bd6c98;
+  --color-mint: #4b987b;
+  --color-danger: #b4374f;
+  --font-sans: var(--font-dm-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-manrope), ui-sans-serif, system-ui, sans-serif;
+  --shadow-soft: 0 12px 34px rgba(43, 26, 52, 0.055);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-wash);
+  color: var(--color-ink);
+}
+
+.eyebrow {
+  font-size: 0.625rem;
+  font-weight: 700;
+  letter-spacing: 0.17em;
+  color: #a49ba9;
+  text-transform: uppercase;
 }

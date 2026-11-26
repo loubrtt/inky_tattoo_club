@@ -72,3 +72,12 @@ This version has breaking changes — APIs, conventions, and file structure may 
 This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
 
 <!-- END:nextjs-agent-rules -->
+
+## Conventions de code (INKY CLIENT)
+
+- Toute lecture de l'utilisateur ou du studio passe par `src/lib/auth/dal.ts` (`requireUser`, `requireStudio`).
+- Chaque Server Action revérifie l'utilisateur et prend `studio_id` / `created_by` du serveur, jamais du formulaire.
+- Toute entrée est validée par un schéma Zod de `src/lib/validation.ts`, avec un test dans `tests/`.
+- Les erreurs techniques vont dans les logs serveur, l'utilisateur voit un message neutre en français.
+- Pas de `cacheComponents` ni de `use cache` sur des données client.
+- Avant de pousser : `make check` et `pnpm build` doivent passer.

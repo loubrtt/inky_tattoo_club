@@ -1,6 +1,6 @@
 PORT ?= 3000
 
-.PHONY: help install dev kill build start lint typecheck format check
+.PHONY: help install dev kill build start lint typecheck format check test db-login db-link db-pull db-types
 
 help: ## Affiche les commandes
 	@grep -E '^[a-z-]+:.*##' $(MAKEFILE_LIST) | awk -F':.*## ' '{printf "  make %-10s %s\n", $$1, $$2}'
@@ -33,5 +33,21 @@ typecheck: ## Vérifie les types
 format: ## Formate le code
 	pnpm format
 
-check: lint typecheck ## Lint + types + format
+check: lint typecheck ## Lint + types + format + tests
 	pnpm format:check
+	pnpm test
+
+test: ## Tests unitaires
+	pnpm test
+
+db-login: ## Connexion au CLI Supabase
+	pnpm exec supabase login
+
+db-link: ## Lie le dossier au projet Supabase
+	pnpm exec supabase link
+
+db-pull: ## Récupère le schéma distant dans supabase/migrations
+	pnpm exec supabase db pull
+
+db-types: ## Génère les types TypeScript du schéma
+	pnpm exec supabase gen types typescript --linked > src/lib/supabase/database.types.ts

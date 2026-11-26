@@ -8,9 +8,9 @@ const securityHeaders = [
   { key: "Strict-Transport-Security", value: "max-age=63072000; includeSubDomains; preload" },
 ];
 
+// Pas de cacheComponents : toutes les pages sont privées et propres à chaque utilisateur,
+// on ne veut aucune donnée client mise en cache côté serveur.
 const nextConfig: NextConfig = {
-  cacheComponents: true,
-  partialPrefetching: true,
   poweredByHeader: false,
   turbopack: {
     rules: {
