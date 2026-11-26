@@ -32,7 +32,7 @@ function Submit() {
     <button
       type="submit"
       disabled={pending}
-      className="border-line text-ink hover:bg-wash flex w-full items-center justify-center gap-3 rounded-xl border bg-white px-4 py-3 font-semibold transition disabled:cursor-wait disabled:opacity-70"
+      className="border-line text-ink hover:bg-wash bg-paper flex w-full items-center justify-center gap-3 rounded-xl border px-4 py-3 font-semibold transition disabled:cursor-wait disabled:opacity-70"
     >
       <GoogleIcon />
       {pending ? "Redirection vers Google…" : "Continuer avec Google"}

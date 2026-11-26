@@ -54,7 +54,7 @@ export default async function DashboardPage() {
                 {m.icon}
               </span>
             </span>
-            <strong className="font-display mt-3 block text-3xl font-extrabold text-[#d6d0da]">
+            <strong className="font-display text-muted/40 mt-3 block text-3xl font-extrabold">
               —
             </strong>
             <small className="text-muted">Module pas encore connecté</small>
