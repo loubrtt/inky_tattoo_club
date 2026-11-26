@@ -34,6 +34,23 @@ export async function signIn(_prev: FormState, formData: FormData): Promise<Form
   redirect(safeNextPath(formData.get("next")));
 }
 
+export async function signInWithGoogle(formData: FormData) {
+  const next = safeNextPath(formData.get("next"));
+  const callback = new URL("/auth/confirm", publicEnv.NEXT_PUBLIC_SITE_URL);
+  callback.searchParams.set("next", next);
+
+  const supabase = await createClient();
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider: "google",
+    options: { redirectTo: callback.toString() },
+  });
+  if (error || !data.url) {
+    logError("signInWithGoogle", error);
+    redirect("/connexion?erreur=google");
+  }
+  redirect(data.url);
+}
+
 export async function requestPasswordReset(
   _prev: FormState,
   formData: FormData,

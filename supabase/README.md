@@ -10,6 +10,17 @@ Les comptes se créent uniquement par invitation (Authentication > Users > Invit
 Authentication > URL Configuration : Site URL `http://localhost:3000` et, dans Redirect URLs,
 ajouter `http://localhost:3000/**` (et plus tard l'URL de production).
 
+## Connexion Google
+
+1. Google Cloud Console > APIs & Services > Credentials > Create credentials > OAuth client ID,
+   type « Web application ». Authorized redirect URI :
+   `https://<project-ref>.supabase.co/auth/v1/callback` (le project ref est dans l'URL Supabase).
+2. Supabase > Authentication > Sign In / Providers > Google : activer, coller Client ID et Client Secret.
+   Le Client Secret reste dans Supabase, jamais dans le repo.
+3. Les URLs de retour sont les mêmes que pour le mot de passe oublié (Redirect URLs ci-dessus).
+
+Un compte Google sans adhésion à un studio arrive sur `/sans-studio` et ne voit rien.
+
 ## 2. Versionner le schéma
 
 ```bash

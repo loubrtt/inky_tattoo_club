@@ -7,6 +7,8 @@ import { getCurrentUser } from "@/lib/auth/dal";
 export const metadata: Metadata = { title: "Connexion" };
 
 const ERRORS: Record<string, string> = {
+  google:
+    "La connexion avec Google n'a pas abouti. Réessaie, ou utilise ton e-mail et ton mot de passe.",
   lien: "Ce lien n'est plus valide, a déjà servi ou a été ouvert dans un autre navigateur. Refais une demande.",
 };
 
