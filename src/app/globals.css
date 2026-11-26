@@ -1,6 +1,6 @@
 @import "tailwindcss";
 
-/* Palette reprise du prototype (legacy/styles.css). */
+/* Palette reprise du prototype d'origine. */
 @theme {
   --color-ink: #24232a;
   --color-muted: #85818d;

@@ -23,7 +23,7 @@ make dev                     # http://localhost:3000 (libère le port avant)
 `src/lib/clients` lecture et création des fiches. `src/lib/validation.ts` schémas Zod.
 `src/proxy.ts` rafraîchit la session et renvoie vers `/connexion` si besoin.
 `supabase/` réglages et versionnage du schéma (voir `supabase/README.md`).
-`legacy/` prototype HTML/JS d'origine, `docs/` contexte du projet, `tests/` tests Vitest.
+`docs/` contexte du projet, `tests/` tests Vitest.
 
 ## Sécurité
 

@@ -1,4 +1,3 @@
-legacy/
 .next/
 pnpm-lock.yaml
 Makefile
