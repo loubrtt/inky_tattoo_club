@@ -3,10 +3,17 @@ import Link from "next/link";
 import { JetBrains_Mono, Pirata_One, Playfair_Display } from "next/font/google";
 import type { CSSProperties, ReactNode } from "react";
 import { getCurrentUser } from "@/lib/auth/dal";
-import { instagramUrl, mailtoUrl, telUrl } from "@/lib/landing/content";
+import { instagramDmUrl, instagramUrl, mailtoUrl, telUrl } from "@/lib/landing/content";
 import { getPublicLanding } from "@/lib/landing/data";
 import { todayKey } from "@/lib/planning/time";
 import { CursorLight } from "./cursor-light";
+import { Intro } from "./intro";
+import { ArtistStories } from "./artist-stories";
+import { MobileTabs } from "./mobile-tabs";
+import { OpenBadge } from "./open-badge";
+import { CopyAddress } from "./copy-address";
+import { InstagramThread } from "./instagram-thread";
+import { MapBlock, MetroBadges } from "./place-card";
 import { OpeningHours } from "./opening-hours";
 import { GlitchTitle } from "./glitch-title";
 import { NeedleRule } from "./needle-rule";
@@ -112,31 +119,53 @@ function Section({
   title,
   children,
   sticky = false,
+  aside,
 }: {
   id: string;
   title: ReactNode;
   children: ReactNode;
   sticky?: boolean;
+  /** Colonne de droite sur ordinateur (sous le contenu sur téléphone). */
+  aside?: ReactNode;
 }) {
   // sticky : la section s'allonge et son contenu reste à l'écran pendant la lecture,
   // seulement si le navigateur gère les animations au scroll et que le mouvement est permis.
-  const tall = "lit-studio supports-[animation-timeline:view()]:motion-safe:min-h-[200vh]";
+  // Ordinateur seulement : sur téléphone, chaque section tient dans un écran (défilement façon Reels).
+  const tall = "lit-studio md:supports-[animation-timeline:view()]:motion-safe:min-h-[200vh]";
   const pinned =
-    "supports-[animation-timeline:view()]:motion-safe:sticky supports-[animation-timeline:view()]:motion-safe:top-28";
+    "md:supports-[animation-timeline:view()]:motion-safe:sticky md:supports-[animation-timeline:view()]:motion-safe:top-28";
   return (
     <section
       id={id}
+      data-snap
       aria-labelledby={`${id}-titre`}
-      className={`scroll-mt-20 px-5 py-24 outline-none sm:px-10 lg:py-40 ${sticky ? tall : ""}`}
+      className={`scroll-mt-20 px-5 py-24 outline-none max-md:flex max-md:min-h-[calc(100svh-4rem)] max-md:scroll-mt-16 max-md:flex-col max-md:justify-center max-md:pt-6 max-md:pb-28 sm:px-10 lg:py-40 ${sticky ? tall : ""}`}
     >
-      <div className={`mx-auto max-w-6xl ${sticky ? pinned : ""}`}>
-        <h2
-          id={`${id}-titre`}
-          className="font-editorial reveal text-5xl leading-none tracking-tight text-balance sm:text-7xl"
-        >
-          {title}
-        </h2>
-        <div className="mt-14 lg:mt-20">{children}</div>
+      <div className={`mx-auto w-full max-w-6xl min-w-0 ${sticky ? pinned : ""}`}>
+        {aside ? (
+          <div className="grid gap-12 md:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)] md:items-center md:gap-16">
+            <div className="min-w-0">
+              <h2
+                id={`${id}-titre`}
+                className="font-editorial reveal text-5xl leading-none tracking-tight text-balance sm:text-7xl"
+              >
+                {title}
+              </h2>
+              <div className="mt-10 max-md:mt-8">{children}</div>
+            </div>
+            <div className="reveal min-w-0">{aside}</div>
+          </div>
+        ) : (
+          <>
+            <h2
+              id={`${id}-titre`}
+              className="font-editorial reveal text-5xl leading-none tracking-tight text-balance sm:text-7xl"
+            >
+              {title}
+            </h2>
+            <div className="mt-14 max-md:mt-8 lg:mt-20">{children}</div>
+          </>
+        )}
       </div>
     </section>
   );
@@ -175,6 +204,20 @@ export default async function LandingPage() {
   const { about, artists, practical, booking } = content;
   // Section du studio fixée pendant la lecture seulement si le texte tient à l'écran.
   const pinStudio = Boolean(about.text && about.text.length <= 600);
+  const igHandle = booking.instagram?.trim().replace(/^@/, "") || null;
+  const igDm = instagramDmUrl(booking.instagram);
+  // Footer : Instagram du studio, puis ceux des artistes (sans doublon).
+  const instagramLinks = [
+    { handle: booking.instagram, name: null as string | null },
+    ...artists.map((a) => ({ handle: a.instagram, name: a.name })),
+  ]
+    .map((x) => {
+      const href = instagramUrl(x.handle);
+      const clean = x.handle?.trim().replace(/^@/, "");
+      return href && clean ? { href, handle: `@${clean}`, name: x.name } : null;
+    })
+    .filter((x): x is { href: string; handle: string; name: string | null } => x !== null)
+    .filter((x, i, list) => list.findIndex((y) => y.href === x.href) === i);
 
   return (
     <div
@@ -187,16 +230,8 @@ export default async function LandingPage() {
         Aller au contenu
       </a>
 
-      {/* Intro à chaque chargement : le cœur bat puis s'ouvre et dévoile la page. */}
-      <div aria-hidden className="intro">
-        <div className="intro-bloom" />
-        <svg viewBox="0 0 24 24" className="intro-heart">
-          <path
-            fill="currentColor"
-            d="M12 21s-7.5-4.6-10-9.3C.3 8.4 2 4.5 5.7 4.1 8.2 3.8 10 5.3 12 7.4c2-2.1 3.8-3.6 6.3-3.3 3.7.4 5.4 4.3 3.7 7.6C19.5 16.4 12 21 12 21z"
-          />
-        </svg>
-      </div>
+      {/* Intro : le cœur bat puis éclate en encre rose (au toucher sur téléphone). */}
+      <Intro />
       <div aria-hidden className="grain" />
 
       <CursorLight />
@@ -204,30 +239,39 @@ export default async function LandingPage() {
       <SmoothAnchors />
 
       <header className="bg-night/90 sticky top-0 z-10 backdrop-blur-sm">
-        <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-6 px-5 sm:px-10">
+        <div className="mx-auto flex h-16 max-w-6xl min-w-0 items-center justify-between gap-3 px-5 sm:px-10 md:gap-6">
           <a
             href="#contenu"
-            className={`font-editorial text-lg font-bold tracking-wide ${focusRing}`}
+            className={`font-editorial min-w-0 truncate text-lg font-bold tracking-wide ${focusRing}`}
           >
             {studioName}
           </a>
+          {practical.week && (
+            <span className="md:hidden">
+              <OpenBadge week={practical.week} closures={practical.closures} />
+            </span>
+          )}
           <SectionNav
             sections={SECTIONS}
             linkClassName={`font-editorial inline-flex min-h-10 items-center px-3 text-sm font-bold tracking-wide uppercase transition-[color,text-shadow] duration-300 ${focusRing}`}
           />
           <Link
             href={team.href}
-            className={`${label} text-bone-dim hover:text-bone inline-flex min-h-10 items-center transition-colors duration-150 ${focusRing}`}
+            className={`${label} text-bone-dim hover:text-bone hidden min-h-10 items-center transition-colors duration-150 md:inline-flex ${focusRing}`}
           >
             {team.text}
           </Link>
         </div>
-        <NeedleRule variant="header" />
+        <NeedleRule variant="header" sections={SECTIONS} />
       </header>
+      <MobileTabs sections={SECTIONS} />
 
       <main id="contenu" className="flex-1 outline-none">
-        <section className="px-5 pt-20 pb-24 sm:px-10 lg:pt-32 lg:pb-32">
-          <div className="mx-auto max-w-6xl">
+        <section
+          data-snap
+          className="px-5 pt-20 pb-24 max-md:flex max-md:min-h-[calc(100svh-4rem)] max-md:flex-col max-md:justify-center max-md:pt-6 max-md:pb-28 sm:px-10 lg:pt-32 lg:pb-32"
+        >
+          <div className="mx-auto w-full max-w-6xl min-w-0">
             <p className={`${label} text-bone-dim hero-in`} style={order(0)}>
               Studio de tatouage
             </p>
@@ -246,11 +290,14 @@ export default async function LandingPage() {
                 <div className="text-bone-dim leading-relaxed text-pretty">
                   <Fill value={content.intro} todo="présentation courte, 2 ou 3 phrases" block />
                 </div>
-                <a
-                  href="#rendez-vous"
-                  className={`bg-bone text-night mt-8 inline-flex min-h-11 items-center rounded-full px-6 text-sm font-semibold transition-[background-color,scale] duration-150 ease-out hover:bg-white active:scale-[0.96] ${focusRing}`}
-                >
-                  Parler de ton projet
+                {/* Version B choisie par Lou : ça vibre comme une machine, l'encre monte, gothique. */}
+                <a href="#rendez-vous" className={`cta-machine font-editorial mt-8 ${focusRing}`}>
+                  <span className="cta-machine-txt">
+                    <span className="cta-machine-norm">Parler de ton projet</span>
+                    <span aria-hidden className="cta-machine-goth">
+                      Parler de ton projet
+                    </span>
+                  </span>
                 </a>
               </div>
             </div>
@@ -287,8 +334,20 @@ export default async function LandingPage() {
         </Section>
 
         <Section id="artistes" title="Les artistes">
+          {artists.length > 0 && (
+            <div className="md:hidden">
+              <ArtistStories
+                artists={artists.map((a) => ({
+                  name: a.name,
+                  styles: a.styles,
+                  bio: a.bio,
+                  instagramUrl: instagramUrl(a.instagram),
+                }))}
+              />
+            </div>
+          )}
           {artists.length ? (
-            <ul className="grid gap-6 md:gap-2">
+            <ul className="hidden gap-6 md:grid md:gap-2">
               {artists.map((a, i) => {
                 const ig = instagramUrl(a.instagram);
                 return (
@@ -332,21 +391,50 @@ export default async function LandingPage() {
         </Section>
 
         <Section id="infos" title="Infos pratiques">
-          <div className="grid gap-14 md:grid-cols-2 md:gap-20">
-            <div className="reveal">
-              <address className="font-editorial grid gap-1 text-3xl leading-tight not-italic">
-                <span>
-                  <Fill value={practical.address} todo="adresse" />
-                </span>
-                <span>
-                  <Fill value={practical.city} todo="code postal et ville" />
-                </span>
+          {/* Téléphone : adresse, carte, puis horaires (écran suivant).
+              Ordinateur : carte sur toute la hauteur à gauche, adresse et horaires à droite. */}
+          <div className="grid gap-x-16 gap-y-12 md:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] md:grid-rows-[auto_1fr]">
+            <div className="reveal min-w-0 md:col-start-2 md:row-start-1 md:pl-10 lg:pl-20">
+              <h3 className={`${label} text-bone-dim mb-4`}>Adresse</h3>
+              <address className="font-editorial text-3xl leading-tight not-italic">
+                {practical.address ? (
+                  <CopyAddress
+                    address={[practical.address, practical.city].filter(Boolean).join(", ")}
+                  >
+                    <span>{practical.address}</span>
+                    <span className="text-bone-dim text-xl">
+                      <Fill value={practical.city} todo="code postal et ville" />
+                    </span>
+                  </CopyAddress>
+                ) : (
+                  <span className="grid gap-1">
+                    <Todo>adresse</Todo>
+                    <span>
+                      <Fill value={practical.city} todo="code postal et ville" />
+                    </span>
+                  </span>
+                )}
               </address>
-              <p className="text-bone-dim mt-6 leading-relaxed text-pretty">
-                <Fill value={practical.access} todo="transports, parking, étage…" />
-              </p>
+              {/* Texte d'accès facultatif : inutile de le réclamer quand les stations sont renseignées. */}
+              {(practical.access || practical.metro.length === 0) && (
+                <p className="text-bone-dim mt-6 leading-relaxed text-pretty whitespace-pre-line">
+                  <Fill value={practical.access} todo="transports, parking, étage…" />
+                </p>
+              )}
+              <div className="mt-5">
+                <MetroBadges metro={practical.metro} />
+              </div>
             </div>
-            <div className="reveal">
+            <MapBlock
+              address={practical.address}
+              city={practical.city}
+              geo={practical.geo}
+              className="reveal md:col-start-1 md:row-span-2 md:row-start-1"
+            />
+            <div
+              data-snap
+              className="reveal max-md:flex max-md:min-h-[calc(100svh-4rem)] max-md:scroll-mt-16 max-md:flex-col max-md:justify-center max-md:pb-28 md:col-start-2 md:row-start-2 md:pl-10 lg:pl-20"
+            >
               <h3 className={`${label} text-bone-dim`}>Horaires</h3>
               {practical.week ? (
                 <OpeningHours
@@ -376,7 +464,11 @@ export default async function LandingPage() {
           </div>
         </Section>
 
-        <Section id="rendez-vous" title={<LitWords text="Ton projet commence par un message." />}>
+        <Section
+          id="rendez-vous"
+          title={<LitWords text="Ton projet commence par un message." />}
+          aside={igDm && igHandle ? <InstagramThread handle={igHandle} href={igDm} /> : undefined}
+        >
           <div className="text-bone-dim reveal max-w-2xl text-xl leading-relaxed text-pretty">
             <Fill
               value={booking.text}
@@ -384,33 +476,38 @@ export default async function LandingPage() {
               block
             />
           </div>
-          <ul className="reveal mt-14 grid gap-4">
-            <li>
-              <ContactLink
-                href={instagramUrl(booking.instagram)}
-                text={booking.instagram ? `@${booking.instagram.trim().replace(/^@/, "")}` : null}
-                todo="Instagram du studio"
-              />
-            </li>
-            <li>
-              <ContactLink
-                href={mailtoUrl(booking.email)}
-                text={booking.email?.trim() ?? null}
-                todo="e-mail du studio"
-              />
-            </li>
-            <li>
-              <ContactLink
-                href={telUrl(booking.phone)}
-                text={booking.phone?.trim() ?? null}
-                todo="téléphone du studio"
-              />
-            </li>
-          </ul>
+          {/* Autres moyens de contact : seulement ceux remplis dans Site public. */}
+          {(mailtoUrl(booking.email) || telUrl(booking.phone)) && (
+            <ul className="reveal mt-10 grid gap-3">
+              {mailtoUrl(booking.email) && (
+                <li>
+                  <ContactLink
+                    href={mailtoUrl(booking.email)}
+                    text={booking.email?.trim() ?? null}
+                    todo="e-mail du studio"
+                  />
+                </li>
+              )}
+              {telUrl(booking.phone) && (
+                <li>
+                  <ContactLink
+                    href={telUrl(booking.phone)}
+                    text={booking.phone?.trim() ?? null}
+                    todo="téléphone du studio"
+                  />
+                </li>
+              )}
+            </ul>
+          )}
+          {!igDm && !mailtoUrl(booking.email) && !telUrl(booking.phone) && (
+            <p className="reveal mt-10">
+              <Todo>moyens de contact</Todo>
+            </p>
+          )}
         </Section>
       </main>
 
-      <footer className="relative px-5 pt-20 pb-12 sm:px-10 lg:pt-28">
+      <footer data-snap-end className="relative px-5 pt-20 pb-32 sm:px-10 md:pb-12 lg:pt-28">
         <NeedleRule variant="footer" />
         <div className="mx-auto grid max-w-6xl gap-12 md:grid-cols-[1.5fr_1fr_1fr]">
           <div>
@@ -439,6 +536,26 @@ export default async function LandingPage() {
             </ul>
           </nav>
           <div className="grid content-start gap-1">
+            {/* Instagram du studio puis des artistes, tels que réglés dans Site public. */}
+            {instagramLinks.length > 0 && (
+              <ul className="mb-4 grid gap-1" aria-label="Instagram">
+                {instagramLinks.map((ig) => (
+                  <li key={ig.href}>
+                    <a
+                      href={ig.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={`font-editorial decoration-bone/30 hover:text-flash hover:decoration-flash inline-flex min-h-10 items-baseline gap-2 underline decoration-1 underline-offset-4 transition-colors duration-150 ${focusRing}`}
+                    >
+                      {ig.handle}
+                      {ig.name && (
+                        <span className="text-bone-dim text-sm no-underline">{ig.name}</span>
+                      )}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            )}
             <Link
               href={team.href}
               className={`text-bone-dim hover:text-bone inline-flex min-h-10 items-center transition-colors duration-150 ${focusRing}`}

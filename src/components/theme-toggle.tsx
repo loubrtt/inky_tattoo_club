@@ -1,14 +1,13 @@
 "use client";
 
 import { startTransition, useState } from "react";
-import { Monitor, Moon, Sun, type LucideIcon } from "lucide-react";
+import { Moon, Sun, type LucideIcon } from "lucide-react";
 import { themeAttr, type Theme } from "@/lib/theme";
 import { saveTheme } from "@/lib/theme-actions";
 
 const OPTIONS: { value: Theme; label: string; icon: LucideIcon }[] = [
-  { value: "light", label: "Clair", icon: Sun },
-  { value: "system", label: "Auto", icon: Monitor },
   { value: "dark", label: "Sombre", icon: Moon },
+  { value: "light", label: "Clair", icon: Sun },
 ];
 
 // Choix du thème : appliqué tout de suite dans la page, puis gardé dans un cookie par le
@@ -20,8 +19,7 @@ export function ThemeToggle({ initial }: { initial: Theme }) {
     setTheme(value);
     const attr = themeAttr(value);
     document.querySelectorAll<HTMLElement>(".app-theme").forEach((el) => {
-      if (attr) el.dataset.theme = attr;
-      else delete el.dataset.theme;
+      el.dataset.theme = attr;
     });
     startTransition(() => saveTheme(value));
   };
@@ -30,7 +28,7 @@ export function ThemeToggle({ initial }: { initial: Theme }) {
     <div
       role="radiogroup"
       aria-label="Thème de l’affichage"
-      className="border-line bg-wash grid min-w-0 grid-cols-3 gap-1 rounded-xl border p-1"
+      className="border-line bg-wash grid min-w-0 grid-cols-2 gap-1 rounded-xl border p-1"
     >
       {OPTIONS.map((o) => {
         const active = theme === o.value;

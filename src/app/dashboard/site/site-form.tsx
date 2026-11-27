@@ -5,10 +5,12 @@ import { useActionState, useRef, useState, type ReactNode } from "react";
 import { saveLanding } from "@/lib/landing/actions";
 import type { LandingContent } from "@/lib/landing/content";
 import { DAY_NAMES, type Slot, type WeekDay } from "@/lib/landing/hours";
+import { lineLabel, TRANSIT_LINES } from "@/lib/landing/transit";
 import { ActionForm, Field, FormMessage, SubmitButton, TextArea } from "@/components/ui";
 
 type ArtistDraft = { key: string; name: string; styles: string; bio: string; instagram: string };
 type ClosureDraft = { key: string; from: string; to: string; reason: string };
+type MetroDraft = { key: string; line: string; station: string };
 type Draft = {
   tagline: string;
   intro: string;
@@ -23,6 +25,7 @@ type Draft = {
   /** false tant que les horaires n'ont jamais été réglés (la landing garde l'ancien texte). */
   weekSet: boolean;
   closures: ClosureDraft[];
+  metro: MetroDraft[];
   bookingText: string;
   bookingInstagram: string;
   bookingEmail: string;
@@ -50,6 +53,7 @@ function toDraft(c: LandingContent): Draft {
     access: s(c.practical.access),
     week: c.practical.week ?? DAY_NAMES.map(() => ({ open: false, slots: [] })),
     weekSet: c.practical.week !== null,
+    metro: c.practical.metro.map((m, i) => ({ key: `m${i}`, line: m.line, station: m.station })),
     closures: c.practical.closures.map((x, i) => ({
       key: `c${i}`,
       from: x.from,
@@ -89,6 +93,7 @@ function toPayload(d: Draft, legacyHours: LandingContent["practical"]["hours"]) 
       hours: legacyHours,
       week: d.weekSet ? d.week : null,
       closures: d.closures.map(({ from, to, reason }) => ({ from, to, reason })),
+      metro: d.metro.map(({ line, station }) => ({ line, station })),
     },
     booking: {
       text: d.bookingText,
@@ -163,6 +168,8 @@ export function SiteForm({ initial }: { initial: LandingContent }) {
       ...day,
       slots: day.slots.map((sl, j) => (j === k ? { ...sl, ...patch } : sl)),
     }));
+  const setMetro = (i: number, patch: Partial<MetroDraft>) =>
+    setDraft((d) => ({ ...d, metro: d.metro.map((m, j) => (j === i ? { ...m, ...patch } : m)) }));
   const setClosure = (i: number, patch: Partial<ClosureDraft>) =>
     setDraft((d) => ({
       ...d,
@@ -335,13 +342,71 @@ export function SiteForm({ initial }: { initial: LandingContent }) {
           />
         </div>
         <TextArea
-          label="Accès (transports, parking, étage…)"
+          label="Accès (parking, étage, digicode…)"
           name="practical.access"
           rows={2}
           maxLength={600}
           error={err("practical.access")}
           {...text("access")}
         />
+        <div className="grid gap-3">
+          <p className="font-medium">Métro et RER à proximité</p>
+          <p className="text-muted -mt-2 text-xs">
+            Affichés en pastilles de couleur sur la landing, à côté de la carte.
+          </p>
+          {draft.metro.map((m, i) => (
+            <div key={m.key} className="grid items-end gap-3 sm:grid-cols-[9rem_1fr_auto]">
+              <label className="text-ink block font-medium">
+                Ligne
+                <select
+                  value={m.line}
+                  onChange={(e) => setMetro(i, { line: e.target.value })}
+                  className="border-line bg-paper focus:border-violet focus:ring-violet-pale mt-1.5 w-full rounded-xl border px-3.5 py-3 text-sm outline-none focus:ring-3"
+                >
+                  {TRANSIT_LINES.map((l) => (
+                    <option key={l.id} value={l.id}>
+                      {lineLabel(l.id)}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <Field
+                label="Station"
+                name={`practical.metro.${i}.station`}
+                placeholder="Ex. Anvers"
+                maxLength={60}
+                value={m.station}
+                onChange={(e) => setMetro(i, { station: e.target.value })}
+                error={err(`practical.metro.${i}`)}
+              />
+              <button
+                type="button"
+                className={`${smallButton} text-danger mb-1`}
+                onClick={() =>
+                  set(
+                    "metro",
+                    draft.metro.filter((_, j) => j !== i),
+                  )
+                }
+              >
+                Retirer
+              </button>
+            </div>
+          ))}
+          <div>
+            <button
+              type="button"
+              className={smallButton}
+              disabled={draft.metro.length >= 6}
+              onClick={() =>
+                set("metro", [...draft.metro, { key: newKey("m"), line: "2", station: "" }])
+              }
+            >
+              <Plus aria-hidden size={16} />
+              Ajouter une station
+            </button>
+          </div>
+        </div>
       </Card>
 
       <Card
@@ -503,7 +568,7 @@ export function SiteForm({ initial }: { initial: LandingContent }) {
         />
         <div className="grid gap-4 sm:grid-cols-3">
           <Field
-            label="Instagram du studio (sans @)"
+            label="Instagram du studio (sans @, sert au bouton « Envoyer un message »)"
             name="booking.instagram"
             maxLength={31}
             autoCapitalize="none"

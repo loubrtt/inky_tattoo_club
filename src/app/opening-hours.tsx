@@ -55,7 +55,7 @@ export function OpeningHours({
     <>
       <p
         aria-live="polite"
-        className={`mt-4 inline-flex min-h-7 items-center gap-2.5 text-lg ${
+        className={`border-bone/12 mt-4 inline-flex min-h-9 items-center gap-2.5 rounded-full border px-3.5 text-sm ${
           status ? "" : "invisible"
         }`}
       >
@@ -75,7 +75,7 @@ export function OpeningHours({
         </span>
         {status?.label ?? "…"}
       </p>
-      <table className="mt-4 w-full max-w-sm text-left text-lg">
+      <table className="mt-5 text-left text-base">
         <tbody>
           {rows.map((h) => {
             const current = isToday(h.days);
@@ -83,23 +83,23 @@ export function OpeningHours({
               <tr key={h.days} className={current ? "text-bone" : undefined}>
                 <th
                   scope="row"
-                  className={`py-1.5 pr-8 font-normal ${current ? "text-flash" : "text-bone-dim"}`}
+                  className={`py-1 pr-10 font-normal ${current ? "text-flash" : "text-bone-dim"}`}
                 >
                   {h.days}
                   {current && <span className="sr-only"> (aujourd’hui)</span>}
                 </th>
-                <td className="py-1.5 tabular-nums">{h.hours ?? "Fermé"}</td>
+                <td className="py-1 tabular-nums">{h.hours ?? "Fermé"}</td>
               </tr>
             );
           })}
         </tbody>
       </table>
       {upcoming.length > 0 && (
-        <div className="mt-8">
+        <div className="mt-7">
           <h4 className="font-label text-bone-dim text-[11px] tracking-[0.18em] uppercase">
             Fermetures exceptionnelles
           </h4>
-          <ul className="mt-3 grid gap-1.5 text-lg">
+          <ul className="mt-2.5 grid gap-1 text-base">
             {upcoming.map((c) => (
               <li key={`${c.from}-${c.to}`}>{closureLabel(c)}</li>
             ))}

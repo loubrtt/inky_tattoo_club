@@ -3,6 +3,7 @@
 // Tout ce qui est ici est PUBLIC : jamais de donnée privée.
 
 import type { Closure, Week } from "@/lib/landing/hours";
+import type { Geo, TransitStop } from "@/lib/landing/transit";
 
 export type Artist = {
   name: string | null;
@@ -27,6 +28,10 @@ export type LandingContent = {
     hours: OpeningHours[];
     week: Week | null;
     closures: Closure[];
+    /** Stations proches (pastilles de couleur sur la landing). */
+    metro: TransitStop[];
+    /** Position calculée par le serveur à partir de l'adresse (carte et itinéraires). */
+    geo: Geo | null;
   };
   booking: {
     text: string | null;
@@ -46,7 +51,16 @@ export const EMPTY_LANDING: LandingContent = {
   intro: null,
   about: { title: null, text: null, styles: [] },
   artists: [],
-  practical: { address: null, city: null, access: null, hours: [], week: null, closures: [] },
+  practical: {
+    address: null,
+    city: null,
+    access: null,
+    hours: [],
+    week: null,
+    closures: [],
+    metro: [],
+    geo: null,
+  },
   booking: { text: null, instagram: null, email: null, phone: null },
 };
 
@@ -58,6 +72,12 @@ const EMAIL = /^[^\s@<>"?]+@[^\s@<>"?]+\.[^\s@<>"?]+$/;
 export function instagramUrl(handle: string | null | undefined): string | null {
   const h = handle?.trim().replace(/^@/, "");
   return h && INSTAGRAM_HANDLE.test(h) ? `https://www.instagram.com/${h}/` : null;
+}
+
+/** Lien qui ouvre directement la conversation Instagram (messagerie), pas le profil. */
+export function instagramDmUrl(handle: string | null | undefined): string | null {
+  const h = handle?.trim().replace(/^@/, "");
+  return h && INSTAGRAM_HANDLE.test(h) ? `https://ig.me/m/${h}` : null;
 }
 
 export function mailtoUrl(email: string | null | undefined): string | null {

@@ -49,6 +49,17 @@ inventer** une donnée, un comportement, une date ou une décision : si une info
 le dire et demander. Être **précis et court** dans les réponses : la conclusion d'abord, les
 détails ensuite, pas de jargon ni de références que Lou ne peut pas suivre sans contexte.
 
+## Pas de boutons « IA slop » sur la landing
+
+Lou refuse les boutons génériques qui sentent l'IA. Sont interdits sur la landing publique :
+pastilles arrondies avec halo ou ombre lumineuse colorée, flèche « → » collée par défaut,
+petites étiquettes en capitales au-dessus du texte du bouton (« Le plus rapide »…), dégradés,
+emojis, rangées de pastilles bordées en police mono. Un bouton reprend le langage déjà validé
+de la landing : police Playfair, verre fumé (fond nuit translucide, fine bordure claire, coins
+peu arrondis, rose au survol, comme les boutons posés sur la carte), trait d'aiguille, liens
+soulignés. Pour tout nouveau style de bouton ou d'encart, proposer d'abord 2 à 4 versions dans
+un artifact et laisser Lou choisir avant de l'intégrer.
+
 ## Sécurité et données (propre à INKY CLIENT)
 
 - Ne jamais mettre de clé `sb_secret_`, `service_role` ou autre secret dans le code client,

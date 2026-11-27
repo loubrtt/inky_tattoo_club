@@ -42,7 +42,7 @@ body {
 }
 
 /* Mode sombre de l'appli (dashboard + pages de connexion, pas la landing).
-   .app-theme porte data-theme="dark" | "light" (choix enregistré) ou rien (= suit le système).
+   .app-theme porte toujours data-theme : "dark" par défaut, "light" si choisi (cookie).
    Les deux blocs ci-dessous doivent rester identiques. */
 .app-theme {
   background: var(--color-wash);
@@ -721,81 +721,86 @@ html:has(.landing)::-webkit-scrollbar-thumb:hover {
     translate: 0 0;
   }
 }
+/* Intro : cœur rose qui bat, puis éclate en encre rose qui dévoile la page. */
 @keyframes intro-heart {
   0% {
     opacity: 0;
     scale: 0.5;
   }
-  12% {
+  10% {
     opacity: 1;
     scale: 1;
   }
   22% {
-    scale: 1.32;
+    scale: 1.25;
   }
-  32% {
-    scale: 0.94;
+  34% {
+    scale: 0.95;
   }
-  42% {
-    scale: 1.2;
+  46% {
+    scale: 1.15;
   }
-  54% {
+  60% {
     opacity: 1;
     scale: 1;
   }
   100% {
     opacity: 0;
-    scale: 16;
+    scale: 2.6;
+  }
+}
+@keyframes intro-beat {
+  0%,
+  100% {
+    scale: 1;
+  }
+  14% {
+    scale: 1.22;
+  }
+  28% {
+    scale: 0.96;
+  }
+  42% {
+    scale: 1.12;
+  }
+}
+@keyframes intro-pop {
+  to {
+    opacity: 0;
+    scale: 2.6;
   }
 }
 @keyframes intro-bloom {
-  0% {
-    opacity: 0;
-    scale: 0.4;
-  }
-  22% {
-    opacity: 1;
-    scale: 1.15;
-  }
-  32% {
-    opacity: 0.6;
-    scale: 0.9;
-  }
-  42% {
-    opacity: 1;
-    scale: 1.1;
-  }
-  54% {
-    opacity: 0.8;
-    scale: 1;
-  }
-  100% {
-    opacity: 0;
-    scale: 6;
-  }
-}
-/* Trou en forme de cœur qui s'agrandit dans l'écran noir. */
-@keyframes intro-hole {
   from {
-    -webkit-mask-size:
-      0 0,
-      auto;
-    mask-size:
-      0 0,
-      auto;
+    scale: 0;
   }
   to {
-    -webkit-mask-size:
-      420vmax 420vmax,
-      auto;
-    mask-size:
-      420vmax 420vmax,
-      auto;
+    scale: 60;
   }
 }
-@keyframes intro-done {
+@keyframes intro-bloom-go {
+  from {
+    scale: 0;
+  }
   to {
+    scale: 60;
+  }
+}
+@keyframes intro-out {
+  to {
+    opacity: 0;
     visibility: hidden;
+  }
+}
+@keyframes intro-out-go {
+  to {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+@keyframes intro-blink {
+  50% {
+    opacity: 0.35;
   }
 }
 
@@ -835,48 +840,77 @@ html:has(.landing)::-webkit-scrollbar-thumb:hover {
   }
 
   .landing .intro {
-    display: block;
+    display: grid;
+    place-items: center;
     position: fixed;
     inset: 0;
     z-index: 50;
     pointer-events: none;
     background: #050405;
-    /* Écran noir percé d'un cœur (penché comme celui de la souris), de taille 0 au départ. */
-    --heart-hole: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath transform='rotate(12 12 12)' d='M12 21s-7.5-4.6-10-9.3C.3 8.4 2 4.5 5.7 4.1 8.2 3.8 10 5.3 12 7.4c2-2.1 3.8-3.6 6.3-3.3 3.7.4 5.4 4.3 3.7 7.6C19.5 16.4 12 21 12 21z'/%3E%3C/svg%3E");
-    -webkit-mask:
-      var(--heart-hole) center / 0 0 no-repeat,
-      linear-gradient(#000 0 0);
-    -webkit-mask-composite: xor;
-    mask:
-      var(--heart-hole) center / 0 0 no-repeat,
-      linear-gradient(#000 0 0);
-    mask-composite: exclude;
-    animation:
-      intro-hole 1000ms cubic-bezier(0.7, 0, 0.25, 1) 1150ms both,
-      intro-done 1ms linear 2150ms forwards;
+    animation: intro-out 700ms ease 1650ms both;
   }
-  .landing .intro-heart,
+  .landing .intro-heart {
+    position: relative;
+    width: 96px;
+    height: 96px;
+    color: var(--color-flash);
+    filter: drop-shadow(0 0 22px var(--color-flash));
+    animation: intro-heart 1900ms cubic-bezier(0.3, 0, 0.1, 1) both;
+  }
   .landing .intro-bloom {
     position: absolute;
     top: 50%;
     left: 50%;
-  }
-  .landing .intro-heart {
-    width: 120px;
-    height: 120px;
-    margin: -60px 0 0 -60px;
-    rotate: 12deg;
-    color: #8e1238;
-    filter: drop-shadow(0 0 18px rgb(176 20 64 / 0.55)) drop-shadow(0 0 70px rgb(120 10 40 / 0.4));
-    animation: intro-heart 2100ms cubic-bezier(0.3, 0, 0.1, 1) both;
-  }
-  .landing .intro-bloom {
-    width: 70vmin;
-    height: 70vmin;
-    margin: -35vmin 0 0 -35vmin;
+    width: 40px;
+    height: 40px;
+    margin: -20px 0 0 -20px;
     border-radius: 50%;
-    background: radial-gradient(circle, rgb(120 10 40 / 0.28), transparent 65%);
-    animation: intro-bloom 2100ms cubic-bezier(0.3, 0, 0.1, 1) both;
+    background: radial-gradient(circle, var(--color-flash), #7a1d5a 45%, var(--color-night) 70%);
+    scale: 0;
+    animation: intro-bloom 1000ms cubic-bezier(0.6, 0, 0.2, 1) 1150ms both;
+  }
+  .landing .intro-hint {
+    display: none;
+  }
+
+  /* Écran tactile : le cœur bat jusqu'au toucher (IntroGate ajoute .go), puis éclate.
+     Sans toucher, l'intro s'ouvre d'elle-même après quelques secondes. */
+  @media (pointer: coarse) {
+    .landing .intro {
+      pointer-events: auto;
+      cursor: pointer;
+      animation: intro-out 700ms ease 6000ms both;
+    }
+    .landing .intro-heart {
+      animation: intro-beat 1100ms ease-in-out infinite;
+    }
+    .landing .intro-bloom {
+      animation: intro-bloom 1000ms cubic-bezier(0.6, 0, 0.2, 1) 5500ms both;
+    }
+    .landing .intro-hint {
+      display: block;
+      position: absolute;
+      bottom: 18%;
+      font-family: var(--font-jetbrains), ui-monospace, monospace;
+      font-size: 10.5px;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--color-bone-dim);
+      animation: intro-blink 2s ease-in-out infinite;
+    }
+    .landing .intro.go {
+      pointer-events: none;
+      animation: intro-out-go 700ms ease 450ms both;
+    }
+    .landing .intro.go .intro-heart {
+      animation: intro-pop 500ms ease-in forwards;
+    }
+    .landing .intro.go .intro-bloom {
+      animation: intro-bloom-go 1000ms cubic-bezier(0.6, 0, 0.2, 1) both;
+    }
+    .landing .intro.go .intro-hint {
+      opacity: 0;
+    }
   }
 
   /* Pendant l'intro, le hero et l'encre attendent l'ouverture du cœur. */
@@ -936,5 +970,101 @@ html:has(.landing)::-webkit-scrollbar-thumb:hover {
 @media (prefers-reduced-motion: no-preference) {
   .landing .needle-rule[data-variant="footer"] .needle-dots {
     animation: needle-march 1.6s linear infinite;
+  }
+}
+
+/* Segments des stories d'artistes (téléphone). */
+@keyframes story {
+  from {
+    scale: 0 1;
+  }
+  to {
+    scale: 1 1;
+  }
+}
+
+/* Téléphone : défilement façon Reels. Un geste = un écran : chaque section (et la page
+   « Horaires ») s'aimante en haut, sans pouvoir en sauter une. Une section plus haute que
+   l'écran reste lisible : le navigateur laisse défiler librement à l'intérieur. */
+@media (max-width: 767px) {
+  html:has(.landing) {
+    scroll-snap-type: y mandatory;
+    scroll-padding-top: 4rem;
+    /* Le défilement « doux » ralentissait l'aimant : sur téléphone, il suit l'élan du doigt.
+       Les liens internes restent animés (SmoothAnchors). */
+    scroll-behavior: auto !important;
+  }
+  .landing [data-snap] {
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+  }
+  .landing [data-snap-end] {
+    scroll-snap-align: end;
+  }
+}
+
+/* Bouton « Parler de ton projet » (haut de la landing) : au survol, il vibre comme une
+   machine qui démarre, l'encre rose monte et le texte passe en gothique. */
+.landing .cta-machine {
+  position: relative;
+  isolation: isolate;
+  display: inline-flex;
+  align-items: center;
+  min-height: 3rem;
+  padding: 0 1.75rem;
+  overflow: hidden;
+  border: 1px solid color-mix(in oklab, var(--color-bone) 40%, transparent);
+  border-radius: 6px;
+  font-size: 1.25rem;
+  transition: border-color 150ms;
+}
+.landing .cta-machine::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--color-flash);
+  transform: translateY(101%);
+  transition: transform 450ms cubic-bezier(0.7, 0, 0.2, 1);
+}
+.landing .cta-machine-txt {
+  display: grid;
+}
+.landing .cta-machine-txt > * {
+  grid-area: 1 / 1;
+  transition: opacity 150ms;
+}
+.landing .cta-machine-goth {
+  font-family: var(--font-gothic-face), "Old English Text MT", serif;
+  font-size: 1.45rem;
+  color: var(--color-night);
+  opacity: 0;
+}
+.landing .cta-machine:is(:hover, :focus-visible, :active) {
+  border-color: var(--color-flash);
+}
+.landing .cta-machine:is(:hover, :focus-visible, :active)::before {
+  transform: translateY(0);
+}
+.landing .cta-machine:is(:hover, :focus-visible, :active) .cta-machine-norm {
+  opacity: 0;
+}
+.landing .cta-machine:is(:hover, :focus-visible, :active) .cta-machine-goth {
+  opacity: 1;
+}
+@keyframes machine-buzz {
+  25% {
+    translate: 0.6px -0.4px;
+  }
+  50% {
+    translate: -0.5px 0.5px;
+  }
+  75% {
+    translate: 0.4px 0.6px;
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .landing .cta-machine:is(:hover, :active) {
+    animation: machine-buzz 90ms linear infinite;
   }
 }

@@ -6,6 +6,8 @@ import { requireStudio } from "@/lib/auth/dal";
 import { logError } from "@/lib/errors";
 import { canEditSite } from "@/lib/roles";
 import { landingSchema, nestedFieldErrors, type FormState } from "@/lib/validation";
+import { geocodeAddress } from "@/lib/landing/geocode";
+import { toLandingContent } from "@/lib/landing/data";
 
 const MAX_PAYLOAD = 60_000;
 
@@ -41,9 +43,30 @@ export async function saveLanding(_prev: FormState, formData: FormData): Promise
   }
 
   const supabase = await createClient();
+
+  // Position de la carte : jamais prise du formulaire. Reprise telle quelle si l'adresse
+  // n'a pas changé, sinon recalculée à partir de l'adresse publique.
+  const content = {
+    ...parsed.data,
+    practical: { ...parsed.data.practical, geo: null as typeof parsed.data.practical.geo },
+  };
+  const { address, city } = content.practical;
+  if (address) {
+    const { data: previous } = await supabase
+      .from("studio_sites")
+      .select("content")
+      .eq("studio_id", current.studioId)
+      .maybeSingle();
+    const old = toLandingContent(previous?.content).practical;
+    content.practical.geo =
+      old.geo && old.address === address && old.city === city
+        ? old.geo
+        : await geocodeAddress(address, city);
+  }
+
   const { error } = await supabase
     .from("studio_sites")
-    .upsert({ studio_id: current.studioId, content: parsed.data }, { onConflict: "studio_id" });
+    .upsert({ studio_id: current.studioId, content }, { onConflict: "studio_id" });
   if (error) {
     logError("landing:save", error);
     if (error.code === "42501")

@@ -6,6 +6,7 @@ import { THEMES } from "@/lib/theme";
 import { PROJECT_STATUSES } from "@/lib/projects/types";
 import { PAYMENT_METHODS, QUOTE_STATUSES } from "@/lib/quotes/types";
 import { parseEuros } from "@/lib/money";
+import { TRANSIT_LINE_IDS } from "@/lib/landing/transit";
 
 const email = z.string().trim().toLowerCase().max(254).pipe(z.email("Adresse e-mail invalide."));
 
@@ -194,6 +195,20 @@ export const landingSchema = z.object({
     // null = horaires jamais réglés (anciens contenus : on affiche alors `hours`).
     week: z.array(weekDaySchema).length(7).nullable().default(null),
     closures: z.array(closureSchema).max(30, "30 fermetures maximum.").default([]),
+    metro: z
+      .array(
+        z.object({
+          line: z.enum(TRANSIT_LINE_IDS, "Ligne inconnue."),
+          station: z.string().trim().min(1, "Station requise.").max(60, "60 caractères maximum."),
+        }),
+      )
+      .max(6, "6 stations maximum.")
+      .default([]),
+    // Rempli par le serveur (géocodage de l'adresse), jamais par le formulaire.
+    geo: z
+      .object({ lat: z.number().min(-90).max(90), lng: z.number().min(-180).max(180) })
+      .nullable()
+      .default(null),
   }),
   booking: z.object({
     text: optionalText(1000),
