@@ -5,9 +5,14 @@ import type { CSSProperties, ReactNode } from "react";
 import { getCurrentUser } from "@/lib/auth/dal";
 import { instagramUrl, mailtoUrl, telUrl } from "@/lib/landing/content";
 import { getPublicLanding } from "@/lib/landing/data";
+import { todayKey } from "@/lib/planning/time";
 import { CursorLight } from "./cursor-light";
+import { OpeningHours } from "./opening-hours";
 import { GlitchTitle } from "./glitch-title";
+import { NeedleRule } from "./needle-rule";
+import { SectionNav } from "./section-nav";
 import { SmoothAnchors } from "./smooth-anchors";
+import { TouchHeart } from "./touch-heart";
 
 const playfair = Playfair_Display({
   variable: "--font-playfair",
@@ -137,8 +142,6 @@ function Section({
   );
 }
 
-const smallHeading = "text-bone-dim text-sm";
-
 // Grand lien de contact : le texte affiché est l'info elle-même (@compte, e-mail, numéro).
 function ContactLink({
   href,
@@ -197,9 +200,10 @@ export default async function LandingPage() {
       <div aria-hidden className="grain" />
 
       <CursorLight />
+      <TouchHeart />
       <SmoothAnchors />
 
-      <header className="border-bone/12 bg-night/90 sticky top-0 z-10 border-b backdrop-blur-sm">
+      <header className="bg-night/90 sticky top-0 z-10 backdrop-blur-sm">
         <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-6 px-5 sm:px-10">
           <a
             href="#contenu"
@@ -207,20 +211,10 @@ export default async function LandingPage() {
           >
             {studioName}
           </a>
-          <nav aria-label="Sections de la page" className="hidden md:block">
-            <ul className="flex gap-1">
-              {SECTIONS.map((s) => (
-                <li key={s.id}>
-                  <a
-                    href={`#${s.id}`}
-                    className={`text-bone-dim hover:text-bone inline-flex min-h-10 items-center px-3 text-sm transition-colors duration-150 ${focusRing}`}
-                  >
-                    {s.label}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </nav>
+          <SectionNav
+            sections={SECTIONS}
+            linkClassName={`font-editorial inline-flex min-h-10 items-center px-3 text-sm font-bold tracking-wide uppercase transition-[color,text-shadow] duration-300 ${focusRing}`}
+          />
           <Link
             href={team.href}
             className={`${label} text-bone-dim hover:text-bone inline-flex min-h-10 items-center transition-colors duration-150 ${focusRing}`}
@@ -228,6 +222,7 @@ export default async function LandingPage() {
             {team.text}
           </Link>
         </div>
+        <NeedleRule variant="header" />
       </header>
 
       <main id="contenu" className="flex-1 outline-none">
@@ -352,8 +347,14 @@ export default async function LandingPage() {
               </p>
             </div>
             <div className="reveal">
-              <h3 className={smallHeading}>Horaires</h3>
-              {practical.hours.length ? (
+              <h3 className={`${label} text-bone-dim`}>Horaires</h3>
+              {practical.week ? (
+                <OpeningHours
+                  week={practical.week}
+                  closures={practical.closures}
+                  today={todayKey()}
+                />
+              ) : practical.hours.length ? (
                 <table className="mt-4 w-full max-w-sm text-left text-lg">
                   <tbody>
                     {practical.hours.map((h) => (
@@ -409,7 +410,8 @@ export default async function LandingPage() {
         </Section>
       </main>
 
-      <footer className="border-bone/12 border-t px-5 pt-20 pb-12 sm:px-10 lg:pt-28">
+      <footer className="relative px-5 pt-20 pb-12 sm:px-10 lg:pt-28">
+        <NeedleRule variant="footer" />
         <div className="mx-auto grid max-w-6xl gap-12 md:grid-cols-[1.5fr_1fr_1fr]">
           <div>
             <p className="font-editorial text-4xl">{studioName}</p>

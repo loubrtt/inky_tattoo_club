@@ -132,9 +132,6 @@ export function ProjectForm({
         defaultValue={project?.artisticNotes ?? ""}
         error={state.errors?.artisticNotes}
       />
-      <p className="text-muted text-xs">
-        Pas de photos, de données de santé ni d’informations sensibles dans ces champs.
-      </p>
       <FormMessage message={state.message} ok={state.ok} />
       <div className="flex flex-wrap gap-2">
         <SubmitButton pending={pending} pendingLabel="Enregistrement…">

@@ -30,7 +30,7 @@ export function ThemeToggle({ initial }: { initial: Theme }) {
     <div
       role="radiogroup"
       aria-label="Thème de l’affichage"
-      className="border-line bg-wash grid grid-cols-3 gap-1 rounded-xl border p-1"
+      className="border-line bg-wash grid min-w-0 grid-cols-3 gap-1 rounded-xl border p-1"
     >
       {OPTIONS.map((o) => {
         const active = theme === o.value;
@@ -42,12 +42,12 @@ export function ThemeToggle({ initial }: { initial: Theme }) {
             role="radio"
             aria-checked={active}
             onClick={() => choose(o.value)}
-            className={`flex items-center justify-center gap-1.5 rounded-lg px-2 py-1.5 text-xs font-semibold transition ${
+            className={`flex min-w-0 items-center justify-center gap-1 rounded-lg px-1 py-1.5 text-[11px] font-semibold transition ${
               active ? "bg-paper text-violet-ink shadow-soft" : "text-muted hover:text-ink"
             }`}
           >
-            <Icon aria-hidden size={14} />
-            {o.label}
+            <Icon aria-hidden size={14} className="shrink-0" />
+            <span className="truncate">{o.label}</span>
           </button>
         );
       })}

@@ -2,6 +2,8 @@
 // et stocké dans studio_sites.content. Chaque valeur à null s'affiche « à compléter ».
 // Tout ce qui est ici est PUBLIC : jamais de donnée privée.
 
+import type { Closure, Week } from "@/lib/landing/hours";
+
 export type Artist = {
   name: string | null;
   styles: string | null;
@@ -21,7 +23,10 @@ export type LandingContent = {
     address: string | null;
     city: string | null;
     access: string | null;
+    /** Ancien format en texte libre, affiché seulement si `week` n'est pas réglé. */
     hours: OpeningHours[];
+    week: Week | null;
+    closures: Closure[];
   };
   booking: {
     text: string | null;
@@ -41,7 +46,7 @@ export const EMPTY_LANDING: LandingContent = {
   intro: null,
   about: { title: null, text: null, styles: [] },
   artists: [],
-  practical: { address: null, city: null, access: null, hours: [] },
+  practical: { address: null, city: null, access: null, hours: [], week: null, closures: [] },
   booking: { text: null, instagram: null, email: null, phone: null },
 };
 

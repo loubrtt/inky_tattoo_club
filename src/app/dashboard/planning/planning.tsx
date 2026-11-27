@@ -32,6 +32,7 @@ export function Planning({
   clients,
   projects,
   initialSelected,
+  openHours,
 }: {
   range: PlanningRange;
   today: string;
@@ -40,6 +41,7 @@ export function Planning({
   clients: ClientOption[];
   projects: ProjectOption[] | null;
   initialSelected: string | null;
+  openHours: Record<string, { from: number; to: number }[]> | null;
 }) {
   const memberMap = useMemo(() => new Map(members.map((m) => [m.userId, m])), [members]);
   const initial: Selection = initialSelected ? { mode: "view", id: initialSelected } : null;
@@ -145,6 +147,7 @@ export function Planning({
               selectedId={selectedId}
               onSelect={(id) => select({ mode: "view", id })}
               onCreate={create}
+              openHours={openHours}
             />
           )}
         </div>

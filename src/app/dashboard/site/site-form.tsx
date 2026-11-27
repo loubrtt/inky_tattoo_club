@@ -1,13 +1,14 @@
 "use client";
 
-import { Plus } from "lucide-react";
+import { Plus, X } from "lucide-react";
 import { useActionState, useRef, useState, type ReactNode } from "react";
 import { saveLanding } from "@/lib/landing/actions";
 import type { LandingContent } from "@/lib/landing/content";
+import { DAY_NAMES, type Slot, type WeekDay } from "@/lib/landing/hours";
 import { ActionForm, Field, FormMessage, SubmitButton, TextArea } from "@/components/ui";
 
 type ArtistDraft = { key: string; name: string; styles: string; bio: string; instagram: string };
-type HoursDraft = { key: string; days: string; hours: string };
+type ClosureDraft = { key: string; from: string; to: string; reason: string };
 type Draft = {
   tagline: string;
   intro: string;
@@ -18,7 +19,10 @@ type Draft = {
   address: string;
   city: string;
   access: string;
-  hours: HoursDraft[];
+  week: WeekDay[];
+  /** false tant que les horaires n'ont jamais été réglés (la landing garde l'ancien texte). */
+  weekSet: boolean;
+  closures: ClosureDraft[];
   bookingText: string;
   bookingInstagram: string;
   bookingEmail: string;
@@ -44,7 +48,14 @@ function toDraft(c: LandingContent): Draft {
     address: s(c.practical.address),
     city: s(c.practical.city),
     access: s(c.practical.access),
-    hours: c.practical.hours.map((h, i) => ({ key: `h${i}`, days: h.days, hours: s(h.hours) })),
+    week: c.practical.week ?? DAY_NAMES.map(() => ({ open: false, slots: [] })),
+    weekSet: c.practical.week !== null,
+    closures: c.practical.closures.map((x, i) => ({
+      key: `c${i}`,
+      from: x.from,
+      to: x.to,
+      reason: s(x.reason),
+    })),
     bookingText: s(c.booking.text),
     bookingInstagram: s(c.booking.instagram),
     bookingEmail: s(c.booking.email),
@@ -53,7 +64,7 @@ function toDraft(c: LandingContent): Draft {
 }
 
 // Brouillon -> forme attendue par landingSchema (le serveur revalide tout).
-function toPayload(d: Draft) {
+function toPayload(d: Draft, legacyHours: LandingContent["practical"]["hours"]) {
   return {
     tagline: d.tagline,
     intro: d.intro,
@@ -75,7 +86,9 @@ function toPayload(d: Draft) {
       address: d.address,
       city: d.city,
       access: d.access,
-      hours: d.hours.map(({ days, hours }) => ({ days, hours })),
+      hours: legacyHours,
+      week: d.weekSet ? d.week : null,
+      closures: d.closures.map(({ from, to, reason }) => ({ from, to, reason })),
     },
     booking: {
       text: d.bookingText,
@@ -131,12 +144,38 @@ export function SiteForm({ initial }: { initial: LandingContent }) {
       return { ...d, artists: list };
     });
 
-  const setHours = (i: number, patch: Partial<HoursDraft>) =>
-    setDraft((d) => ({ ...d, hours: d.hours.map((h, j) => (j === i ? { ...h, ...patch } : h)) }));
+  const setDay = (i: number, update: (day: WeekDay, week: WeekDay[]) => WeekDay) =>
+    setDraft((d) => ({
+      ...d,
+      weekSet: true,
+      week: d.week.map((day, j) => (j === i ? update(day, d.week) : day)),
+    }));
+  const toggleDay = (i: number, open: boolean) =>
+    setDay(i, (day, week) => {
+      if (!open) return { ...day, open: false };
+      if (day.slots.length) return { ...day, open: true };
+      // Pré-rempli avec les horaires du jour ouvert le plus proche avant, modifiables ensuite.
+      const model = [...week.slice(0, i)].reverse().find((w) => w.open && w.slots.length);
+      return { open: true, slots: model ? model.slots : [{ from: "10:00", to: "19:00" }] };
+    });
+  const setSlot = (i: number, k: number, patch: Partial<Slot>) =>
+    setDay(i, (day) => ({
+      ...day,
+      slots: day.slots.map((sl, j) => (j === k ? { ...sl, ...patch } : sl)),
+    }));
+  const setClosure = (i: number, patch: Partial<ClosureDraft>) =>
+    setDraft((d) => ({
+      ...d,
+      closures: d.closures.map((c, j) => (j === i ? { ...c, ...patch } : c)),
+    }));
 
   return (
     <ActionForm action={action} className="grid max-w-3xl gap-5">
-      <input type="hidden" name="content" value={JSON.stringify(toPayload(draft))} />
+      <input
+        type="hidden"
+        name="content"
+        value={JSON.stringify(toPayload(draft, initial.practical.hours))}
+      />
 
       <Card title="En-tête" hint="Sous le grand nom du studio, en haut de la page.">
         <Field
@@ -303,55 +342,153 @@ export function SiteForm({ initial }: { initial: LandingContent }) {
           error={err("practical.access")}
           {...text("access")}
         />
-        <div className="grid gap-3">
-          <p className="font-medium">Horaires</p>
-          {draft.hours.map((h, i) => (
-            <div key={h.key} className="grid items-end gap-3 sm:grid-cols-[1fr_1fr_auto]">
-              <Field
-                label="Jours"
-                name={`practical.hours.${i}.days`}
-                placeholder="Ex. du mardi au samedi"
-                maxLength={40}
-                value={h.days}
-                onChange={(e) => setHours(i, { days: e.target.value })}
-                error={err(`practical.hours.${i}.days`)}
-              />
-              <Field
-                label="Heures (vide = fermé)"
-                name={`practical.hours.${i}.hours`}
-                placeholder="Ex. de 11h à 19h"
-                maxLength={40}
-                value={h.hours}
-                onChange={(e) => setHours(i, { hours: e.target.value })}
-                error={err(`practical.hours.${i}.hours`)}
-              />
-              <button
-                type="button"
-                className={`${smallButton} text-danger mb-1`}
-                onClick={() =>
-                  set(
-                    "hours",
-                    draft.hours.filter((_, j) => j !== i),
-                  )
-                }
-              >
-                Retirer
-              </button>
+      </Card>
+
+      <Card
+        title="Horaires d’ouverture"
+        hint="Sur la landing, les visiteurs voient en direct si le studio est ouvert et quand il rouvre. Le planning grise les heures fermées."
+      >
+        <div className="divide-line grid divide-y">
+          {draft.week.map((day, i) => (
+            <div key={DAY_NAMES[i]} className="grid items-start gap-3 py-3 sm:grid-cols-[9rem_1fr]">
+              <label className="flex items-center gap-2.5 pt-2 font-medium capitalize">
+                <input
+                  type="checkbox"
+                  checked={day.open}
+                  onChange={(e) => toggleDay(i, e.target.checked)}
+                  className="accent-violet size-4"
+                />
+                {DAY_NAMES[i]}
+              </label>
+              {day.open ? (
+                <div className="grid gap-2">
+                  {day.slots.map((slot, k) => (
+                    <div key={k} className="flex flex-wrap items-center gap-2">
+                      <input
+                        type="time"
+                        aria-label={`${DAY_NAMES[i]}, début du créneau ${k + 1}`}
+                        value={slot.from}
+                        step={900}
+                        onChange={(e) => setSlot(i, k, { from: e.target.value })}
+                        className="border-line bg-paper rounded-lg border px-2.5 py-2 text-sm tabular-nums"
+                      />
+                      <span className="text-muted">–</span>
+                      <input
+                        type="time"
+                        aria-label={`${DAY_NAMES[i]}, fin du créneau ${k + 1}`}
+                        value={slot.to}
+                        step={900}
+                        onChange={(e) => setSlot(i, k, { to: e.target.value })}
+                        className="border-line bg-paper rounded-lg border px-2.5 py-2 text-sm tabular-nums"
+                      />
+                      {k === 1 && (
+                        <button
+                          type="button"
+                          aria-label={`Retirer le 2e créneau du ${DAY_NAMES[i]}`}
+                          onClick={() => setDay(i, (d) => ({ ...d, slots: d.slots.slice(0, 1) }))}
+                          className="text-muted hover:bg-wash hover:text-ink grid size-8 place-items-center rounded-lg"
+                        >
+                          <X aria-hidden size={16} />
+                        </button>
+                      )}
+                      {k === 0 && day.slots.length === 1 && (
+                        <button
+                          type="button"
+                          className={smallButton}
+                          onClick={() =>
+                            setDay(i, (d) => ({
+                              ...d,
+                              slots: [...d.slots, { from: d.slots[0].to, to: "19:00" }],
+                            }))
+                          }
+                        >
+                          <Plus aria-hidden size={14} />
+                          Pause
+                        </button>
+                      )}
+                    </div>
+                  ))}
+                  {err(`practical.week.${i}`) && (
+                    <p className="text-danger text-xs">{err(`practical.week.${i}`)}</p>
+                  )}
+                </div>
+              ) : (
+                <p className="text-muted pt-2">Fermé</p>
+              )}
             </div>
           ))}
-          <div>
+        </div>
+      </Card>
+
+      <Card
+        title="Fermetures exceptionnelles"
+        hint="Vacances, salon, jour férié… Affichées sur la landing jusqu’à leur dernier jour, puis masquées automatiquement."
+      >
+        {draft.closures.map((c, i) => (
+          <div key={c.key} className="grid items-end gap-3 sm:grid-cols-[1fr_1fr_1.4fr_auto]">
+            <Field
+              label="Du"
+              name={`practical.closures.${i}.from`}
+              type="date"
+              value={c.from}
+              onChange={(e) =>
+                setClosure(i, {
+                  from: e.target.value,
+                  ...(c.to === "" || c.to < e.target.value ? { to: e.target.value } : {}),
+                })
+              }
+              error={err(`practical.closures.${i}.from`)}
+            />
+            <Field
+              label="Au (inclus)"
+              name={`practical.closures.${i}.to`}
+              type="date"
+              min={c.from || undefined}
+              value={c.to}
+              onChange={(e) => setClosure(i, { to: e.target.value })}
+              error={err(`practical.closures.${i}.to`)}
+            />
+            <Field
+              label="Motif (facultatif)"
+              name={`practical.closures.${i}.reason`}
+              placeholder="Ex. Congés d’hiver"
+              maxLength={80}
+              value={c.reason}
+              onChange={(e) => setClosure(i, { reason: e.target.value })}
+              error={err(`practical.closures.${i}.reason`)}
+            />
             <button
               type="button"
-              className={smallButton}
-              disabled={draft.hours.length >= 14}
+              className={`${smallButton} text-danger mb-1`}
               onClick={() =>
-                set("hours", [...draft.hours, { key: newKey("h"), days: "", hours: "" }])
+                set(
+                  "closures",
+                  draft.closures.filter((_, j) => j !== i),
+                )
               }
             >
-              <Plus aria-hidden size={16} />
-              Ajouter une ligne d’horaires
+              Retirer
             </button>
           </div>
+        ))}
+        <div>
+          <button
+            type="button"
+            className={smallButton}
+            disabled={draft.closures.length >= 30}
+            onClick={() =>
+              set("closures", [
+                ...draft.closures,
+                { key: newKey("c"), from: "", to: "", reason: "" },
+              ])
+            }
+          >
+            <Plus aria-hidden size={16} />
+            Ajouter une fermeture
+          </button>
+          {err("practical.closures") && (
+            <p className="text-danger mt-2 text-xs">{err("practical.closures")}</p>
+          )}
         </div>
       </Card>
 

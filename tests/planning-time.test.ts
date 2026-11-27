@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { parseDateKey, parseView, rangeFor, utcToWall, wallToUtcIso } from "@/lib/planning/time";
+import { moveAppointmentSchema, resizeAppointmentSchema } from "@/lib/validation";
 
 const NOW = new Date("2026-11-26T12:00:00Z");
 
@@ -69,5 +70,51 @@ describe("rangeFor", () => {
     const r = rangeFor("jour", "2026-11-26");
     expect(r.days).toEqual(["2026-11-26"]);
     expect(r.title).toBe("Jeudi 26 novembre 2026");
+  });
+});
+
+describe("resizeAppointmentSchema", () => {
+  const id = "4f1c2b8e-1d2a-4c3b-9e8f-0a1b2c3d4e5f";
+  it("accepte des heures dans l'ordre", () => {
+    expect(resizeAppointmentSchema.safeParse({ id, start: "10:00", end: "11:15" }).success).toBe(
+      true,
+    );
+    expect(resizeAppointmentSchema.safeParse({ id, start: "00:00", end: "23:59" }).success).toBe(
+      true,
+    );
+  });
+  it("refuse fin avant début, 24:00, id invalide", () => {
+    expect(resizeAppointmentSchema.safeParse({ id, start: "11:00", end: "11:00" }).success).toBe(
+      false,
+    );
+    expect(resizeAppointmentSchema.safeParse({ id, start: "12:00", end: "11:00" }).success).toBe(
+      false,
+    );
+    expect(resizeAppointmentSchema.safeParse({ id, start: "10:00", end: "24:00" }).success).toBe(
+      false,
+    );
+    expect(
+      resizeAppointmentSchema.safeParse({ id: "pas-un-id", start: "10:00", end: "11:00" }).success,
+    ).toBe(false);
+  });
+});
+
+describe("moveAppointmentSchema", () => {
+  const id = "4f1c2b8e-1d2a-4c3b-9e8f-0a1b2c3d4e5f";
+  it("accepte un jour et une heure valides", () => {
+    expect(
+      moveAppointmentSchema.safeParse({ id, date: "2026-11-30", start: "14:15" }).success,
+    ).toBe(true);
+  });
+  it("refuse date mal formée, heure invalide, id invalide", () => {
+    expect(
+      moveAppointmentSchema.safeParse({ id, date: "30/11/2026", start: "14:15" }).success,
+    ).toBe(false);
+    expect(
+      moveAppointmentSchema.safeParse({ id, date: "2026-11-30", start: "24:00" }).success,
+    ).toBe(false);
+    expect(
+      moveAppointmentSchema.safeParse({ id: "x", date: "2026-11-30", start: "10:00" }).success,
+    ).toBe(false);
   });
 });

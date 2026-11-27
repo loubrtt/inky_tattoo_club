@@ -1,9 +1,11 @@
 import Link from "next/link";
-import { LogOut } from "lucide-react";
+import { ArrowUpRight, LogOut } from "lucide-react";
 import { Brand } from "@/components/brand";
 import { Nav } from "@/components/nav";
 import { StudioSwitcher } from "@/components/studio-switcher";
 import { requireStudio } from "@/lib/auth/dal";
+import { getMyProfile, profileOf } from "@/lib/profile/data";
+import { displayName } from "@/lib/profile/display";
 import { signOut } from "@/lib/auth/actions";
 import { canEditSite, canSeeMoney, ROLE_LABELS } from "@/lib/roles";
 import { ThemeToggle } from "@/components/theme-toggle";
@@ -12,8 +14,9 @@ import { readTheme } from "@/lib/theme-server";
 
 export default async function AppLayout({ children }: LayoutProps<"/dashboard">) {
   const { user, studios, current } = await requireStudio();
-  const initial = (user.email ?? "I").charAt(0).toUpperCase();
-  const theme = await readTheme();
+  const [theme, profileResult] = await Promise.all([readTheme(), getMyProfile()]);
+  const name = displayName(profileOf(profileResult), user.email);
+  const initial = name.charAt(0).toUpperCase();
 
   return (
     <div
@@ -32,19 +35,32 @@ export default async function AppLayout({ children }: LayoutProps<"/dashboard">)
           {current.studioName}
         </div>
         <Nav canSeeMoney={canSeeMoney(current.role)} canEditSite={canEditSite(current.role)} />
-        <div className="border-line mt-4 grid gap-3 border-t pt-4 lg:mt-auto">
+        <div className="border-line mt-4 grid min-w-0 grid-cols-1 gap-3 border-t pt-4 lg:mt-auto">
+          <Link
+            href="/"
+            className="text-muted hover:bg-wash hover:text-ink flex items-center justify-between gap-2 rounded-lg px-3 py-2 text-sm font-semibold"
+          >
+            Retour sur le site
+            <ArrowUpRight aria-hidden size={16} />
+          </Link>
           <StudioSwitcher studios={studios} currentId={current.studioId} />
           <ThemeToggle initial={theme} />
-          <div className="flex items-center gap-3 px-1">
-            <span className="bg-violet-pale text-violet grid size-9 shrink-0 place-items-center rounded-full font-bold">
-              {initial}
-            </span>
-            <span className="min-w-0 flex-1">
-              <strong className="block truncate text-xs">{user.email}</strong>
-              <small className="text-muted block truncate text-[11px]">
-                {ROLE_LABELS[current.role]} · {current.studioName}
-              </small>
-            </span>
+          <div className="flex items-center gap-1 px-1">
+            <Link
+              href="/dashboard/reglages#mon-compte"
+              title="Mon compte"
+              className="hover:bg-wash -my-1 flex min-w-0 flex-1 items-center gap-3 rounded-lg py-1 pr-1"
+            >
+              <span className="bg-violet-pale text-violet grid size-9 shrink-0 place-items-center rounded-full font-bold">
+                {initial}
+              </span>
+              <span className="min-w-0 flex-1">
+                <strong className="block truncate text-xs">{name}</strong>
+                <small className="text-muted block truncate text-[11px]">
+                  {ROLE_LABELS[current.role]} · {current.studioName}
+                </small>
+              </span>
+            </Link>
             <form action={signOut}>
               <button
                 aria-label="Se déconnecter"

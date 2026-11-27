@@ -335,9 +335,6 @@ function AppointmentForm({
         defaultValue={d.notes}
         error={state.errors?.notes}
       />
-      <p className="bg-pink text-rose rounded-xl px-3.5 py-3 text-xs">
-        Pas de données de santé ni d&apos;informations sensibles dans les notes à ce stade.
-      </p>
       {!state.ok && <FormMessage message={state.message} />}
       <div className="flex gap-2">
         <SubmitButton pending={pending} pendingLabel="Enregistrement…">

@@ -27,12 +27,18 @@ export const newPasswordSchema = z
     message: "Les deux mots de passe ne correspondent pas.",
   });
 
+// Champ facultatif : null (valeur déjà enregistrée) est relu comme une chaîne vide.
+const emptyIfNull = (v: unknown) => (v === null ? "" : v);
+
 const optionalText = (max: number) =>
-  z
-    .string()
-    .trim()
-    .max(max, `${max} caractères maximum.`)
-    .transform((v) => (v === "" ? null : v));
+  z.preprocess(
+    emptyIfNull,
+    z
+      .string()
+      .trim()
+      .max(max, `${max} caractères maximum.`)
+      .transform((v) => (v === "" ? null : v)),
+  );
 
 export const clientSchema = z.object({
   firstName: z.string().trim().min(1, "Prénom requis.").max(80, "80 caractères maximum."),
@@ -70,30 +76,88 @@ export const appointmentSchema = z
   })
   .refine((v) => v.end > v.start, { path: ["end"], message: "La fin doit être après le début." });
 
+// Redimensionnement d'un rendez-vous depuis la grille : nouvelles heures, même jour.
+export const resizeAppointmentSchema = z
+  .object({
+    id: z.string().trim().pipe(z.uuid("Rendez-vous introuvable.")),
+    start: time,
+    end: time,
+  })
+  .refine((v) => v.end > v.start, { path: ["end"], message: "La fin doit être après le début." });
+
+// Déplacement d'un rendez-vous depuis la grille : nouveau jour et nouvelle heure de début,
+// la durée est gardée côté serveur.
+export const moveAppointmentSchema = z.object({
+  id: z.string().trim().pipe(z.uuid("Rendez-vous introuvable.")),
+  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Date invalide."),
+  start: time,
+});
+
 // Site public (landing) : tout est facultatif, vide = « à compléter » sur la page.
-const instagramHandle = z
-  .string()
-  .trim()
-  .transform((v) => v.replace(/^@/, ""))
-  .refine(
-    (v) => v === "" || INSTAGRAM_HANDLE.test(v),
-    "Identifiant Instagram invalide (sans @ ni lien).",
-  )
-  .transform((v) => (v === "" ? null : v));
+const instagramHandle = z.preprocess(
+  emptyIfNull,
+  z
+    .string()
+    .trim()
+    .transform((v) => v.replace(/^@/, ""))
+    .refine(
+      (v) => v === "" || INSTAGRAM_HANDLE.test(v),
+      "Identifiant Instagram invalide (sans @ ni lien).",
+    )
+    .transform((v) => (v === "" ? null : v)),
+);
 
-const optionalEmail = z
-  .string()
-  .trim()
-  .toLowerCase()
-  .max(254)
-  .refine((v) => v === "" || z.email().safeParse(v).success, "Adresse e-mail invalide.")
-  .transform((v) => (v === "" ? null : v));
+const optionalEmail = z.preprocess(
+  emptyIfNull,
+  z
+    .string()
+    .trim()
+    .toLowerCase()
+    .max(254)
+    .refine((v) => v === "" || z.email().safeParse(v).success, "Adresse e-mail invalide.")
+    .transform((v) => (v === "" ? null : v)),
+);
 
-const optionalPhone = z
+const optionalPhone = z.preprocess(
+  emptyIfNull,
+  z
+    .string()
+    .trim()
+    .refine((v) => v === "" || PHONE.test(v), "Numéro invalide.")
+    .transform((v) => (v === "" ? null : v)),
+);
+
+// Horaires : 7 jours (lundi -> dimanche), 1 ou 2 créneaux par jour ouvert.
+const slotSchema = z
+  .object({ from: time, to: time })
+  .refine((v) => v.to > v.from, { path: ["to"], message: "La fin doit être après le début." });
+
+const weekDaySchema = z
+  .object({ open: z.boolean(), slots: z.array(slotSchema).max(2, "2 créneaux maximum.") })
+  .refine((d) => !d.open || d.slots.length > 0, {
+    path: ["slots"],
+    message: "Ajoute au moins un créneau.",
+  })
+  .refine((d) => d.slots.length < 2 || d.slots[1].from >= d.slots[0].to, {
+    path: ["slots", 1, "from"],
+    message: "Le 2e créneau doit commencer après la fin du 1er.",
+  })
+  .transform((d) => (d.open ? d : { open: false, slots: [] }));
+
+const realDate = z
   .string()
-  .trim()
-  .refine((v) => v === "" || PHONE.test(v), "Numéro invalide.")
-  .transform((v) => (v === "" ? null : v));
+  .regex(/^\d{4}-\d{2}-\d{2}$/, "Date invalide.")
+  .refine((v) => {
+    // Zod continue après une regex en échec : on revérifie le format avant de calculer.
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(v)) return true;
+    const [y, m, d] = v.split("-").map(Number);
+    const date = new Date(Date.UTC(y, m - 1, d));
+    return !Number.isNaN(date.getTime()) && date.toISOString().slice(0, 10) === v;
+  }, "Date invalide.");
+
+const closureSchema = z
+  .object({ from: realDate, to: realDate, reason: optionalText(80) })
+  .refine((c) => c.to >= c.from, { path: ["to"], message: "La fin doit être après le début." });
 
 export const landingSchema = z.object({
   tagline: optionalText(160),
@@ -127,6 +191,9 @@ export const landingSchema = z.object({
         }),
       )
       .max(14, "14 lignes maximum."),
+    // null = horaires jamais réglés (anciens contenus : on affiche alors `hours`).
+    week: z.array(weekDaySchema).length(7).nullable().default(null),
+    closures: z.array(closureSchema).max(30, "30 fermetures maximum.").default([]),
   }),
   booking: z.object({
     text: optionalText(1000),
@@ -210,6 +277,13 @@ export const paymentSchema = z.object({
 export const removePaymentSchema = z.object({ id: requiredUuid("Règlement introuvable.") });
 
 export const themeSchema = z.enum(THEMES);
+
+// Mon compte : prénom obligatoire, nom et téléphone facultatifs.
+export const profileSchema = z.object({
+  firstName: z.string().trim().min(1, "Prénom requis.").max(80, "80 caractères maximum."),
+  lastName: optionalText(80),
+  phone: optionalPhone,
+});
 
 export type FieldErrors = Partial<Record<string, string>>;
 

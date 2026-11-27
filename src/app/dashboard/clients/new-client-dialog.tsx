@@ -53,9 +53,6 @@ export function NewClientDialog({ label = "Nouveau client" }: { label?: string }
               <X aria-hidden size={18} />
             </button>
           </div>
-          <p className="bg-pink text-rose rounded-xl px-3.5 py-3 text-xs">
-            Fiche de test uniquement. Pas de données de santé ni de documents sensibles à ce stade.
-          </p>
           <div className="grid gap-4 sm:grid-cols-2">
             <Field
               label="Prénom"
@@ -88,7 +85,7 @@ export function NewClientDialog({ label = "Nouveau client" }: { label?: string }
               name="project"
               rows={3}
               maxLength={1000}
-              placeholder="Résumé non sensible du projet…"
+              placeholder="Résumé du projet…"
               error={state.errors?.project}
             />
           </div>
