@@ -1068,3 +1068,39 @@ html:has(.landing)::-webkit-scrollbar-thumb:hover {
     animation: machine-buzz 90ms linear infinite;
   }
 }
+
+/* Enseigne néon du statut ouvert / fermé (landing). */
+.landing .neon {
+  font-family: var(--font-gothic-face), "Old English Text MT", serif;
+  letter-spacing: 0.02em;
+}
+.landing .neon-on {
+  color: #ffd9f2;
+  text-shadow:
+    0 0 4px #fff,
+    0 0 12px var(--color-flash),
+    0 0 28px var(--color-flash);
+}
+.landing .neon-off {
+  color: transparent;
+  -webkit-text-stroke: 1px color-mix(in oklab, var(--color-bone) 30%, transparent);
+}
+@keyframes neon-flicker {
+  0%,
+  18%,
+  22%,
+  62%,
+  64%,
+  100% {
+    opacity: 1;
+  }
+  20%,
+  63% {
+    opacity: 0.45;
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .landing .neon-on {
+    animation: neon-flicker 5s infinite;
+  }
+}

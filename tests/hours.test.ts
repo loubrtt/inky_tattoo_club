@@ -62,6 +62,7 @@ describe("openStatus", () => {
     expect(openStatus(WEEK, [], { dateKey: "2026-12-01", minutes: 11 * 60 })).toEqual({
       open: true,
       label: "Ouvert · ferme à 19:00",
+      detail: "Jusqu’à 19:00",
     });
   });
   it("avant l'ouverture, pendant la pause, après la fermeture", () => {
@@ -86,8 +87,17 @@ describe("openStatus", () => {
       open: false,
       exceptional: true,
       label: "Fermé exceptionnellement · ouvre le 5 janv. à 10:00",
+      detail: "Fermeture exceptionnelle · on rallume le 5 janv. à 10:00",
     });
     expect(openSlotsOn(WEEK, closures, "2026-12-23")).toEqual([]);
+  });
+  it("texte sous l'enseigne quand c'est fermé", () => {
+    expect(openStatus(WEEK, [], { dateKey: "2026-12-01", minutes: 19 * 60 }).detail).toBe(
+      "On rallume demain à 10:00",
+    );
+    expect(
+      openStatus(Array(7).fill(closed), [], { dateKey: "2026-12-01", minutes: 0 }).detail,
+    ).toBeNull();
   });
   it("jamais ouvert", () => {
     expect(openStatus(Array(7).fill(closed), [], { dateKey: "2026-12-01", minutes: 0 }).label).toBe(

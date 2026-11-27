@@ -110,8 +110,10 @@ export function groupWeek(week: Week): { days: string; hours: string | null }[] 
   }));
 }
 
+/** label : phrase complète ; detail : la suite seule, affichée sous l'enseigne néon. */
 export type OpenStatus =
-  { open: true; label: string } | { open: false; label: string; exceptional: boolean };
+  | { open: true; label: string; detail: string }
+  | { open: false; label: string; detail: string | null; exceptional: boolean };
 
 /** « Ouvert · ferme à 19:00 » ou « Fermé · ouvre demain à 10:00 », recherche sur 60 jours. */
 export function openStatus(
@@ -123,7 +125,8 @@ export function openStatus(
   const current = todaySlots.find(
     (s) => toMinutes(s.from) <= now.minutes && now.minutes < toMinutes(s.to),
   );
-  if (current) return { open: true, label: `Ouvert · ferme à ${current.to}` };
+  if (current)
+    return { open: true, label: `Ouvert · ferme à ${current.to}`, detail: `Jusqu’à ${current.to}` };
 
   const exceptional = closureOn(closures, now.dateKey) !== null;
   for (let i = 0; i < 60; i++) {
@@ -144,7 +147,13 @@ export function openStatus(
       open: false,
       exceptional,
       label: `${exceptional ? "Fermé exceptionnellement" : "Fermé"} · ouvre ${when}`,
+      detail: `${exceptional ? "Fermeture exceptionnelle · on" : "On"} rallume ${when}`,
     };
   }
-  return { open: false, exceptional, label: exceptional ? "Fermé exceptionnellement" : "Fermé" };
+  return {
+    open: false,
+    exceptional,
+    label: exceptional ? "Fermé exceptionnellement" : "Fermé",
+    detail: exceptional ? "Fermeture exceptionnelle" : null,
+  };
 }

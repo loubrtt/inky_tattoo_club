@@ -53,28 +53,15 @@ export function OpeningHours({
 
   return (
     <>
-      <p
-        aria-live="polite"
-        className={`border-bone/12 mt-4 inline-flex min-h-9 items-center gap-2.5 rounded-full border px-3.5 text-sm ${
-          status ? "" : "invisible"
-        }`}
-      >
-        {/* Ouvert : point rose avec onde « sonar » ; fermé : point éteint, sans animation. */}
-        <span aria-hidden className="relative grid size-2.5 place-items-center">
-          {status?.open && (
-            <>
-              <span className="bg-flash absolute inset-0 rounded-full opacity-70 motion-safe:animate-[sonar_2s_cubic-bezier(0,0,0.2,1)_infinite]" />
-              <span className="bg-flash absolute inset-0 rounded-full opacity-70 motion-safe:animate-[sonar_2s_cubic-bezier(0,0,0.2,1)_1s_infinite]" />
-            </>
-          )}
-          <span
-            className={`relative size-2.5 rounded-full ${
-              status?.open ? "bg-flash shadow-[0_0_10px_var(--color-flash)]" : "bg-bone-dim"
-            }`}
-          />
-        </span>
-        {status?.label ?? "…"}
-      </p>
+      {/* Enseigne néon (version D choisie par Lou) : « Ouvert » allumé, « Fermé » tube éteint. */}
+      <div aria-live="polite" className={`mt-3 ${status ? "" : "invisible"}`}>
+        <p className={`neon text-5xl leading-none ${status?.open ? "neon-on" : "neon-off"}`}>
+          {status ? (status.open ? "Ouvert" : "Fermé") : "Fermé"}
+        </p>
+        {status?.detail && (
+          <p className="neon text-bone-dim mt-2 text-2xl leading-tight">{status.detail}</p>
+        )}
+      </div>
       <table className="mt-5 text-left text-base">
         <tbody>
           {rows.map((h) => {
